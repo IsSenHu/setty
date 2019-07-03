@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @Configuration
 @ConditionalOnBean(annotation = EnableProtoServer.class)
-@ConditionalOnClass({ProtoChannelPoolMap.class, ProtoChannelPoolHandler.class, ProtoCodec.class, ProtoDispatcherHandler.class})
+@ConditionalOnClass({ProtoChannelPoolMap.class, ProtoChannelPoolHandler.class, ProtoCodec.class, ProtoDispatcherHandler.class, ServerProperties.class})
 @EnableConfigurationProperties(ServerProperties.class)
 public class EnableProtoAutoConfiguration {
 
@@ -67,23 +67,6 @@ public class EnableProtoAutoConfiguration {
         initModuleAndMethod();
         // 启动服务器
         startServer();
-    }
-
-    /**
-     * 启动服务器
-     */
-    private void startServer() {
-        int port = sp.getPort();
-        ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap
-                .group(new NioEventLoopGroup())
-                .channel(NioServerSocketChannel.class)
-                .localAddress(port)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .childOption(ChannelOption.TCP_NODELAY, true)
-                .childHandler(createChannel());
-        bootstrap.bind().syncUninterruptibly();
     }
 
     /**
@@ -118,6 +101,28 @@ public class EnableProtoAutoConfiguration {
         });
     }
 
+    /**
+     * 启动服务器
+     */
+    private void startServer() {
+        int port = sp.getPort();
+        ServerBootstrap bootstrap = new ServerBootstrap();
+        bootstrap
+                .group(new NioEventLoopGroup())
+                .channel(NioServerSocketChannel.class)
+                .localAddress(port)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .childHandler(createChannel());
+        bootstrap.bind().syncUninterruptibly();
+    }
+
+    /**
+     * 创建 Channel处理链
+     *
+     * @return ChannelHandler
+     */
     private ChannelHandler createChannel() {
         return new ChannelInitializer<SocketChannel>() {
             @Override
