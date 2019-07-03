@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * Proto 服务器自动化配置
+ *
  * @author HuSen
  * create on 2019/7/3 15:22
  */
@@ -61,6 +63,33 @@ public class EnableProtoAutoConfiguration {
     }
 
     private void doInit() {
+        // 初始化模块和方法
+        initModuleAndMethod();
+        // 启动服务器
+        startServer();
+    }
+
+    /**
+     * 启动服务器
+     */
+    private void startServer() {
+        int port = sp.getPort();
+        ServerBootstrap bootstrap = new ServerBootstrap();
+        bootstrap
+                .group(new NioEventLoopGroup())
+                .channel(NioServerSocketChannel.class)
+                .localAddress(port)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .childHandler(createChannel());
+        bootstrap.bind().syncUninterruptibly();
+    }
+
+    /**
+     * 初始化模块和方法
+     */
+    private void initModuleAndMethod() {
         long appId = sp.getAppId();
         Assert.isTrue(appId >= Id.MIN_APP_ID && appId <= Id.MAX_APP_ID, "appId 的取值不合法");
 
@@ -87,18 +116,6 @@ public class EnableProtoAutoConfiguration {
                 }
             });
         });
-
-        int port = sp.getPort();
-        ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap
-                .group(new NioEventLoopGroup())
-                .channel(NioServerSocketChannel.class)
-                .localAddress(port)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .childOption(ChannelOption.TCP_NODELAY, true)
-                .childHandler(createChannel());
-        bootstrap.bind().syncUninterruptibly();
     }
 
     private ChannelHandler createChannel() {
