@@ -1,7 +1,7 @@
-package com.setty.rpc.handler.proto;
+package com.setty.rpc.handler.proto.server;
 
 import com.setty.commons.proto.RpcProto;
-import com.setty.rpc.cache.proto.PCache;
+import com.setty.rpc.cache.proto.ProtoCache;
 import com.setty.rpc.cons.proto.Code;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -40,8 +40,8 @@ public class ProtoDispatcherHandler extends SimpleChannelInboundHandler<RpcProto
         if (log.isDebugEnabled()) {
             log.debug("请求参数:{}", request.toString());
         }
-        Method method = PCache.getMethod(request.getMethod());
-        Object o = PCache.getController(request.getMethod());
+        Method method = ProtoCache.getMethod(request.getMethod());
+        Object o = ProtoCache.getController(request.getMethod());
         if (method != null && o != null) {
             method.invoke(o, ctx, request);
         } else {

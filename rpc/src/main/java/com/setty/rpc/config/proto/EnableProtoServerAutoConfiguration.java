@@ -3,13 +3,13 @@ package com.setty.rpc.config.proto;
 import com.setty.rpc.annotation.proto.EnableProtoServer;
 import com.setty.rpc.annotation.proto.ProtoConsumer;
 import com.setty.rpc.annotation.proto.ProtoController;
-import com.setty.rpc.cache.proto.PCache;
+import com.setty.rpc.cache.proto.ProtoCache;
 import com.setty.rpc.cons.proto.Id;
-import com.setty.rpc.handler.proto.ProtoCodec;
-import com.setty.rpc.handler.proto.ProtoDispatcherHandler;
+import com.setty.rpc.handler.proto.server.ProtoCodec;
+import com.setty.rpc.handler.proto.server.ProtoDispatcherHandler;
 import com.setty.rpc.pool.map.ProtoChannelPoolMap;
 import com.setty.rpc.pool.proto.ProtoChannelPoolHandler;
-import com.setty.rpc.properties.ServerProperties;
+import com.setty.rpc.properties.proto.ServerProperties;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -18,7 +18,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -40,9 +39,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @Configuration
 @ConditionalOnBean(annotation = EnableProtoServer.class)
-@ConditionalOnClass({ProtoChannelPoolMap.class, ProtoChannelPoolHandler.class, ProtoCodec.class, ProtoDispatcherHandler.class, ServerProperties.class})
 @EnableConfigurationProperties(ServerProperties.class)
-public class EnableProtoAutoConfiguration {
+public class EnableProtoServerAutoConfiguration {
 
     private final ServerProperties sp;
     private final ApplicationContext context;
@@ -50,7 +48,7 @@ public class EnableProtoAutoConfiguration {
     private AtomicBoolean init = new AtomicBoolean(false);
 
     @Autowired
-    public EnableProtoAutoConfiguration(ServerProperties sp, ApplicationContext context) {
+    public EnableProtoServerAutoConfiguration(ServerProperties sp, ApplicationContext context) {
         this.sp = sp;
         this.context = context;
     }
@@ -93,9 +91,9 @@ public class EnableProtoAutoConfiguration {
                     int methodId = consumer.value();
                     Assert.isTrue(methodId >= Id.MIN_CONSUMER_ID || methodId <= Id.MAX_CONSUMER_ID, "methodId 的取值范围不合法");
                     long id = appId + moduleId + methodId;
-                    Assert.isTrue(!PCache.controllerExist(id) && !PCache.methodExist(id), "ID" + id + "重复了，请检查");
-                    PCache.addController(id, c);
-                    PCache.addMethod(id, method);
+                    Assert.isTrue(!ProtoCache.controllerExist(id) && !ProtoCache.methodExist(id), "ID" + id + "重复了，请检查");
+                    ProtoCache.addController(id, c);
+                    ProtoCache.addMethod(id, method);
                 }
             });
         });

@@ -1,4 +1,4 @@
-package com.setty.rpc.handler.proto;
+package com.setty.rpc.handler.proto.server;
 
 import com.setty.commons.proto.RpcProto;
 import io.netty.buffer.ByteBuf;

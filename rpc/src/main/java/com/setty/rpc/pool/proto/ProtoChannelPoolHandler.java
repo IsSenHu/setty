@@ -1,7 +1,10 @@
 package com.setty.rpc.pool.proto;
 
+import com.setty.rpc.handler.proto.client.ProtoCodec;
+import com.setty.rpc.handler.proto.client.ProtoResponseHandler;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.pool.ChannelPoolHandler;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +33,8 @@ public class ProtoChannelPoolHandler implements ChannelPoolHandler {
 
     @Override
     public void channelCreated(Channel ch) {
-
+        ChannelPipeline pipeline = ch.pipeline();
+        pipeline.addLast(new ProtoCodec());
+        pipeline.addLast(new ProtoResponseHandler());
     }
 }

@@ -32,3 +32,8 @@ message Response {
     // 响应数据
     google.protobuf.Any data = 5;
 }
+
+// 测试数据
+message Test {
+    string name = 1;
+}
