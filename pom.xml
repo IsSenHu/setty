@@ -6,6 +6,8 @@
     <modules>
         <module>rpc</module>
         <module>commons</module>
+        <module>rpc-consumer</module>
+        <module>rpc-producer</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

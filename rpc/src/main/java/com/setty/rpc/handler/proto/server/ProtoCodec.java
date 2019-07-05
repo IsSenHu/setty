@@ -2,7 +2,6 @@ package com.setty.rpc.handler.proto.server;
 
 import com.setty.commons.proto.RpcProto;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import java.util.List;
  * create on 2019/7/3 14:51
  */
 @Slf4j
-@ChannelHandler.Sharable
 public class ProtoCodec extends ByteToMessageCodec<RpcProto.Response> {
 
     /**

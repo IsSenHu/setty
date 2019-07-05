@@ -6,6 +6,7 @@ package com.setty.rpc.callback;
  * @author HuSen
  * create on 2019/7/4 9:51
  */
+@FunctionalInterface
 public interface Callback<T> {
 
     /**

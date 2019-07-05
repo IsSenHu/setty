@@ -3,7 +3,6 @@ package com.setty.rpc.handler.proto.client;
 import com.setty.commons.proto.RpcProto;
 import com.setty.rpc.cache.proto.ProtoCache;
 import com.setty.rpc.callback.proto.ProtoCallback;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
  * create on 2019/7/4 9:49
  */
 @Slf4j
-@ChannelHandler.Sharable
 public class ProtoResponseHandler extends SimpleChannelInboundHandler<RpcProto.Response> {
 
     @Override

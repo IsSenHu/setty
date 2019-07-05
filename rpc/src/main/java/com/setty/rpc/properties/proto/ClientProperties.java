@@ -16,8 +16,5 @@ import java.util.Map;
 @Setter
 @Component
 public class ClientProperties {
-
-    private String test;
-
     private Map<String, ClientP> clients;
 }

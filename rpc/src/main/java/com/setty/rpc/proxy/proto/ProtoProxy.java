@@ -3,25 +3,20 @@ package com.setty.rpc.proxy.proto;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 import com.setty.commons.proto.RpcProto;
-import com.setty.commons.util.SpringBeanUtil;
 import com.setty.rpc.annotation.proto.Client;
 import com.setty.rpc.annotation.proto.ProtoClient;
 import com.setty.rpc.cache.proto.ProtoCache;
 import com.setty.rpc.callback.proto.ProtoCallback;
-import com.setty.rpc.pool.map.ProtoChannelPoolMap;
 import io.netty.channel.Channel;
-import io.netty.channel.pool.FixedChannelPool;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.cglib.proxy.InvocationHandler;
 import org.springframework.cglib.proxy.Proxy;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author HuSen
@@ -53,32 +48,49 @@ public class ProtoProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object o, Method method, Object[] objects) {
-        log.info("invoke:{}", interfaceClass);
         ProtoClient protoClient = ProtoCache.getProtoClient(interfaceClass);
         Client client = ProtoCache.getClient(method);
-        log.info("{} - {}", protoClient, client);
-        Message message = (Message) objects[0];
-        Any any = Any.pack(message);
-        log.info("params:{}", any);
+        long appId = protoClient.appId();
+
         RpcProto.Request.Builder builder = RpcProto.Request.newBuilder();
         String id = UUID.randomUUID().toString();
+        // 请求ID
         builder.setId(id);
-        builder.setMethod(protoClient.appId() + client.methodId() + client.methodId());
-        builder.setParams(any);
+        // 请求方法
+        builder.setMethod(appId + client.moduleId() + client.methodId());
+        for (Object object : objects) {
+            judgeParam(builder, id, object);
+        }
         RpcProto.Request request = builder.build();
 
-        List<String> keys = ProtoCache.getKeys(protoClient.appId());
-        if (keys != null && keys.size() > 0) {
-            String key = keys.get(0);
-            ProtoChannelPoolMap poolMap = SpringBeanUtil.getBean(ProtoChannelPoolMap.class);
-            FixedChannelPool pool = poolMap.get(key);
-            Future<Channel> acquire = pool.acquire();
-            acquire.addListener((GenericFutureListener<Future<Channel>>) future -> {
-                Channel channel = future.getNow();
+        // 获取到目标服务器集合 这里可以写策略算法
+        List<Channel> channelList = ProtoCache.getChannels(appId);
+        if (CollectionUtils.isEmpty(channelList)) {
+            // 没有找到目标服务
+            if (log.isWarnEnabled()) {
+                log.warn("没有找到目标服务:{}", appId);
+            }
+        } else {
+            Channel channel = channelList.get(0);
+            if (channel != null) {
                 channel.writeAndFlush(request);
-            });
+            }
         }
-        ProtoCallback protoCallback = new ProtoCallback();
         return null;
+    }
+
+    private void judgeParam(RpcProto.Request.Builder builder, String id, Object param) {
+        if (param instanceof Message) {
+            Message message = (Message) param;
+            Any any = Any.pack(message);
+            builder.setParams(any);
+        } else if (param instanceof ProtoCallback) {
+            ProtoCallback callback = (ProtoCallback) param;
+            ProtoCache.addCallback(id, callback);
+        } else {
+            if (log.isWarnEnabled()) {
+                log.warn("方法 {} 没有使用的参数:{}", builder.getMethod(), param);
+            }
+        }
     }
 }

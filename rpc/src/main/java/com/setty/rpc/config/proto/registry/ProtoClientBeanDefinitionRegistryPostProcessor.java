@@ -9,6 +9,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ResourceLoaderAware;
@@ -25,6 +26,7 @@ import java.util.Map;
  * create on 2019/7/4 9:35
  */
 @Slf4j
+@ConditionalOnBean(annotation = EnableProtoClient.class)
 public class ProtoClientBeanDefinitionRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor, ResourceLoaderAware, ApplicationContextAware {
 
     private ResourceLoader resourceLoader;

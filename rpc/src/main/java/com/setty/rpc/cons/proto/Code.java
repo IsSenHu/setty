@@ -5,6 +5,8 @@ package com.setty.rpc.cons.proto;
  * create on 2019/7/3 17:55
  */
 public enum Code {
+    // 成功
+    SUCCESS(0, "success"),
     // 没有找到请求的资源
     NOT_FOUND(4004, "not found");
     private int code;

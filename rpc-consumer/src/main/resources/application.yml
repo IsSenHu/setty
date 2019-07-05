@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+setty:
+  proto:
+    client:
+      clients:
+        producer:
+          host: 127.0.0.1
+          port: 8081
+          app-id: 100000000
+          connection-timeout: 2000

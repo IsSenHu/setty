@@ -2,7 +2,6 @@ package com.setty.rpc.handler.proto.client;
 
 import com.setty.commons.proto.RpcProto;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 
@@ -12,7 +11,6 @@ import java.util.List;
  * @author HuSen
  * create on 2019/7/4 9:40
  */
-@ChannelHandler.Sharable
 public class ProtoCodec extends ByteToMessageCodec<RpcProto.Request> {
 
     @Override

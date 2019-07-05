@@ -1,9 +1,7 @@
 package com.setty.rpc.config.proto;
 
 import com.setty.rpc.annotation.proto.EnableProtoClient;
-import com.setty.rpc.cache.proto.ProtoCache;
 import com.setty.rpc.pool.map.ProtoChannelPoolMap;
-import com.setty.rpc.properties.proto.ClientP;
 import com.setty.rpc.properties.proto.ClientProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -51,7 +48,6 @@ public class EnableProtoClientAutoConfiguration {
     }
 
     private void doInit() {
-        Map<String, ClientP> clients = cp.getClients();
-        clients.forEach((k, c) -> ProtoCache.addKey(c.getAppId(), k));
+
     }
 }

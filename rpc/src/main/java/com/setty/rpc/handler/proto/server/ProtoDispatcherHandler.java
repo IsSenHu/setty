@@ -43,7 +43,8 @@ public class ProtoDispatcherHandler extends SimpleChannelInboundHandler<RpcProto
         Method method = ProtoCache.getMethod(request.getMethod());
         Object o = ProtoCache.getController(request.getMethod());
         if (method != null && o != null) {
-            method.invoke(o, ctx, request);
+            Object invoke = method.invoke(o, request);
+            ctx.writeAndFlush(invoke);
         } else {
             do404(ctx, request);
         }

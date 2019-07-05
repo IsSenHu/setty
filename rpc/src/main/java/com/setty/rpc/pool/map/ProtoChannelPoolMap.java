@@ -1,18 +1,23 @@
 package com.setty.rpc.pool.map;
 
+import com.setty.rpc.cache.proto.ProtoCache;
 import com.setty.rpc.pool.proto.ProtoChannelPoolHandler;
 import com.setty.rpc.properties.proto.ClientP;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.pool.AbstractChannelPoolMap;
 import io.netty.channel.pool.ChannelHealthChecker;
 import io.netty.channel.pool.FixedChannelPool;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import org.springframework.util.Assert;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author HuSen
@@ -54,9 +59,9 @@ public class ProtoChannelPoolMap extends AbstractChannelPoolMap<String, FixedCha
                 // 获取连接超时时间
                 5000,
                 // 最大连接数
-                10000,
+                10,
                 // 最大等待获取连接数
-                10000,
+                10,
                 // 释放的时候是否进行健康检查
                 false,
                 // true Channel selection will be LIFO, if false FIFO
@@ -67,5 +72,14 @@ public class ProtoChannelPoolMap extends AbstractChannelPoolMap<String, FixedCha
 
     public void start() {
         clientMap.keySet().forEach(this::newPool);
+        clientMap.forEach((k, c) -> {
+            FixedChannelPool fixedChannelPool = this.get(k);
+            ProtoCache.addPool(c.getAppId(), fixedChannelPool);
+            Future<Channel> acquire = fixedChannelPool.acquire();
+            acquire.addListener((GenericFutureListener<Future<Channel>>) future -> {
+                Channel channel = future.get(5, TimeUnit.SECONDS);
+                ProtoCache.addChannel(c.getAppId(), channel);
+            });
+        });
     }
 }

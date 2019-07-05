@@ -3,6 +3,8 @@ package com.setty.rpc.cache.proto;
 import com.setty.rpc.annotation.proto.Client;
 import com.setty.rpc.annotation.proto.ProtoClient;
 import com.setty.rpc.callback.proto.ProtoCallback;
+import io.netty.channel.Channel;
+import io.netty.channel.pool.FixedChannelPool;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -63,10 +65,6 @@ public class ProtoCache {
         CALLBACK_CACHE.put(key, callback);
     }
 
-    public static boolean callbackExist(String key) {
-        return CALLBACK_CACHE.containsKey(key);
-    }
-
     /**
      * ProtoClient 缓存
      */
@@ -94,20 +92,34 @@ public class ProtoCache {
     }
 
     /**
-     * appId 和 key 对应关系
+     * appId 和 Pool 对应关系
      */
-    private static final Map<Long, List<String>> APP_ID_KEY_CACHE = new HashMap<>();
+    private static final Map<Long, List<FixedChannelPool>> APP_ID_POOL_CACHE = new HashMap<>();
 
-    public static void addKey(Long appId, String key) {
-        List<String> keys = APP_ID_KEY_CACHE.get(appId);
-        if (null == keys) {
-            keys = new ArrayList<>();
-            APP_ID_KEY_CACHE.putIfAbsent(appId, keys);
-        }
-        keys.add(key);
+    public static void addPool(Long appId, FixedChannelPool pool) {
+        addItem(APP_ID_POOL_CACHE, pool, appId);
     }
 
-    public static List<String> getKeys(Long appId) {
-        return APP_ID_KEY_CACHE.get(appId);
+    public static List<FixedChannelPool> getPools(Long appId) {
+        return APP_ID_POOL_CACHE.get(appId);
+    }
+
+    /**
+     * appId 和 Channel 对应关系
+     */
+    private static final Map<Long, List<Channel>> APP_ID_CAHNNEL_CACHE = new HashMap<>();
+
+    public static void addChannel(Long appId, Channel channel) {
+        addItem(APP_ID_CAHNNEL_CACHE, channel, appId);
+    }
+
+    public static List<Channel> getChannels(Long appId) {
+        return APP_ID_CAHNNEL_CACHE.get(appId);
+    }
+
+    private static <T, S> void addItem(Map<T, List<S>> map, S item, T key) {
+        // 若key对应的value为空，会将第二个参数的返回值存入并返回
+        List<S> list = map.computeIfAbsent(key, k -> new ArrayList<>());
+        list.add(item);
     }
 }

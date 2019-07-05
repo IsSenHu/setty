@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package setty;
+
+// 指定java代码的包路径
+option java_package = "com.setty.producer.sdk.proto";
+// 自定义生成java文件的名称
+option java_outer_classname = "RpcProducer";
+
+// 小猫
+message Cat {
+    string name = 1;
+    int32 age = 2;
+    string sex = 3;
+    string color = 4;
+}

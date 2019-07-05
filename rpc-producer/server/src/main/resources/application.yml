@@ -1,0 +1,5 @@
+setty:
+  proto:
+    server:
+      app-id: 100000000
+      port: 8081
