@@ -1,6 +1,6 @@
 package com.setty.rpc.config.proto.registry;
 
-import com.setty.commons.util.SpringClassUtil;
+import com.setty.commons.util.spring.SpringClassUtil;
 import com.setty.rpc.annotation.proto.EnableProtoClient;
 import com.setty.rpc.annotation.proto.ProtoClient;
 import com.setty.rpc.proxy.proto.ProtoProxyFactory;

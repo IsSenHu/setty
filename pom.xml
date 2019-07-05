@@ -8,6 +8,7 @@
         <module>commons</module>
         <module>rpc-consumer</module>
         <module>rpc-producer</module>
+        <module>discovery</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -28,6 +29,7 @@
         <protobuf.version>3.8.0</protobuf.version>
         <grpc.version>1.21.0</grpc.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
+        <guava.version>26.0-jre</guava.version>
     </properties>
 
     <dependencies>
@@ -92,6 +94,12 @@
                 <artifactId>grpc-stub</artifactId>
                 <version>${grpc.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

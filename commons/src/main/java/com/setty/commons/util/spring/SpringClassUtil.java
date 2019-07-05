@@ -1,4 +1,4 @@
-package com.setty.commons.util;
+package com.setty.commons.util.spring;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;

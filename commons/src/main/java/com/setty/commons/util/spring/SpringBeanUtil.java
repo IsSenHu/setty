@@ -1,4 +1,4 @@
-package com.setty.commons.util;
+package com.setty.commons.util.spring;
 
 import org.springframework.context.ApplicationContext;
 
