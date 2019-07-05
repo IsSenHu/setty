@@ -5,7 +5,6 @@ import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Objects;
 
 /**
  * 1支持 preferSameZoneEureka，即有多个分区的话，优先选择与应用实例所在分区一样的其他服务的实例(AvailabilityZone)，如果没有找到则默认使用 defaultZone
@@ -23,24 +22,28 @@ public class Main {
     public static void main(String[] args) {
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder()
-                .url("")
+                .url("http://118.24.38.46:10001/eureka/apps")
+                .header("Cookie", "JSESSIONID=EB80FD2D355982B16171BAB283506AE0")
                 .get()
                 .build();
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+        while (true) {
+            Call call = okHttpClient.newCall(request);
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
 
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) {
-                try {
-                    log.info("{}", Objects.requireNonNull(response.body()).string());
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) {
+                    try {
+                        log.info("线程ID:{}", Thread.currentThread().getId());
+                        response.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 }
