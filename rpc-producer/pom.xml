@@ -10,7 +10,6 @@
         <groupId>com.setty</groupId>
         <artifactId>setty</artifactId>
         <version>1.0.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <artifactId>rpc-producer</artifactId>
     <version>1.0.0</version>
