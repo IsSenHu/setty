@@ -40,7 +40,7 @@ public class LeaseInfoVO implements Serializable {
     private Long evictionTimestamp;
 
     /**
-     * Server 段设置的该服务实例标记为UP的时间 serviceUpTimestamp
+     * Server 端设置的该服务实例标记为UP的时间 serviceUpTimestamp
      */
     private Long serviceUpTimestamp;
 }

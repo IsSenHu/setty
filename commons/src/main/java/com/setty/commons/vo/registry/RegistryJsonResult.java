@@ -1,6 +1,7 @@
 package com.setty.commons.vo.registry;
 
 import com.setty.commons.cons.JsonResultCode;
+import com.setty.commons.cons.registry.Apps;
 import com.setty.commons.vo.BaseJsonResult;
 
 /**
@@ -29,6 +30,6 @@ public class RegistryJsonResult<T> extends BaseJsonResult<T> {
 
     @Override
     public Integer appCode() {
-        return 10000;
+        return Apps.REGISTRY_APP_CODE;
     }
 }

@@ -3,6 +3,7 @@ package com.setty.commons.util.http;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -14,6 +15,8 @@ import java.util.Map;
 public class OkHttpUtil {
 
     private static final OkHttpClient CLIENT = new OkHttpClient();
+
+    private static final String JSON = "application/json;charset=utf-8";
 
     /**
      * 异步Get请求
@@ -45,8 +48,70 @@ public class OkHttpUtil {
                 .get()
                 .build();
         Call call = CLIENT.newCall(request);
+        return execAndResp(call);
+    }
+
+    /**
+     * 同步Post请求
+     *
+     * @param url     请求地址
+     * @param body    请求体
+     * @param headers 请求头
+     * @return 响应body
+     */
+    public static String postSync(String url, String body, Headers headers) {
+        Request.Builder builder = new Request.Builder()
+                .url(url)
+                .post(RequestBody.create(body, MediaType.get(JSON)));
+        if (null != headers) {
+            builder.headers(headers);
+        }
+        Request request = builder.build();
+        Call call = CLIENT.newCall(request);
+        return execAndResp(call);
+    }
+
+    /**
+     * 同步Delete请求
+     *
+     * @param url     请求地址
+     * @param headers 请求头
+     * @return 响应body
+     */
+    public static String deleteSync(String url, Headers headers) {
+        Request.Builder builder = new Request.Builder()
+                .url(url)
+                .delete();
+        if (null != headers) {
+            builder.headers(headers);
+        }
+        Request request = builder.build();
+        Call call = CLIENT.newCall(request);
+        return execAndResp(call);
+    }
+
+    /**
+     * 同步Put请求
+     *
+     * @param url     请求地址
+     * @param headers 请求头
+     * @return 响应body
+     */
+    public static String putSync(String url, Headers headers) {
+        Request.Builder builder = new Request.Builder()
+                .url(url)
+                .put(RequestBody.create(StringUtils.EMPTY.getBytes()));
+        if (null != headers) {
+            builder.headers(headers);
+        }
+        Request request = builder.build();
+        Call call = CLIENT.newCall(request);
+        return execAndResp(call);
+    }
+
+    private static String execAndResp(Call call) {
         // 注意资源的释放
-        try(Response response = call.execute()) {
+        try (Response response = call.execute()) {
             ResponseBody body = response.body();
             if (body == null) {
                 return null;

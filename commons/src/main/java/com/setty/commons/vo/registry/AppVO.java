@@ -24,6 +24,11 @@ public class AppVO implements Serializable {
     private Integer port;
     private String instanceName;
 
+    /**
+     * 租约信息
+     * */
+    private LeaseInfoVO leaseInfo;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {return true;}
