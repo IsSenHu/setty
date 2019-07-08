@@ -59,11 +59,11 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
                 RegistryJsonResult result = JSON.parseObject(resp, RegistryJsonResult.class);
                 if (StringUtils.isBlank(resp) || result == null || result.getCode() != Apps.REGISTRY_APP_CODE + JsonResultCode.SUCCESS.getCode()) {
                     // 如果队列满了 会直接返回false
-                    EnableDiscoveryConfiguration.REGISTER_QUEUE.offer(() -> register(vo, leaseDuration, isReplication));
+                    EnableDiscoveryConfiguration.RUN_QUEUE.offer(() -> register(vo, leaseDuration, isReplication));
                 }
                 // 注册成功 可以开始续约
                 else {
-                    EnableDiscoveryConfiguration.RENEWAL_QUEUE.offer(() -> renewal(vo.getAppId(), vo.getInstanceName(), isReplication));
+                    EnableDiscoveryConfiguration.RUN_QUEUE.offer(() -> renewal(vo.getAppId(), vo.getInstanceName(), isReplication));
                 }
             }
         });

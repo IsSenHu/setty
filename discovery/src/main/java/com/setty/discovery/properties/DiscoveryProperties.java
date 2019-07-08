@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author HuSen
@@ -25,4 +26,12 @@ public class DiscoveryProperties {
     private Integer leaseDuration = 90;
 
     private Integer renewalIntervalInSecs = 30;
+
+    private Long appId;
+
+    private String host;
+
+    private Integer port;
+
+    private String instanceName = UUID.randomUUID().toString();
 }
