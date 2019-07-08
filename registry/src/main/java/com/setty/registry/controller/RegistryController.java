@@ -1,7 +1,6 @@
 package com.setty.registry.controller;
 
 import com.setty.commons.vo.registry.AppVO;
-import com.setty.commons.vo.registry.RegistryJsonResult;
 import com.setty.registry.service.RegistryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

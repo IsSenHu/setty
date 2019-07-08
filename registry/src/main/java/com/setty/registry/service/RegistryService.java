@@ -1,7 +1,6 @@
 package com.setty.registry.service;
 
 import com.setty.commons.vo.registry.AppVO;
-import com.setty.commons.vo.registry.RegistryJsonResult;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

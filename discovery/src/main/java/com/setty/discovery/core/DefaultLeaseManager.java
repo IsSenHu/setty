@@ -7,7 +7,6 @@ import com.setty.commons.cons.registry.Header;
 import com.setty.commons.util.http.OkHttpUtil;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.commons.vo.registry.LeaseInfoVO;
-import com.setty.commons.vo.registry.RegistryJsonResult;
 import com.setty.discovery.config.EnableDiscoveryConfiguration;
 import com.setty.discovery.core.infs.LeaseManager;
 import com.setty.discovery.properties.DiscoveryProperties;
