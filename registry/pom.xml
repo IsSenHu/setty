@@ -6,11 +6,11 @@
         <groupId>com.setty</groupId>
         <artifactId>setty</artifactId>
         <version>1.0.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <artifactId>registry</artifactId>
     <version>1.0.0</version>
     <name>registry</name>
+    <packaging>jar</packaging>
     <description>服务注册中心</description>
 
     <properties>
@@ -32,6 +32,12 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.setty</groupId>
+            <artifactId>discovery</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

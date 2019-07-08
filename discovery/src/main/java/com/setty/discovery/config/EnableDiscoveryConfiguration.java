@@ -1,17 +1,19 @@
 package com.setty.discovery.config;
 
 import com.setty.commons.vo.registry.AppVO;
+import com.setty.discovery.annotation.EnableDiscoveryClient;
 import com.setty.discovery.core.DefaultLeaseManager;
 import com.setty.discovery.core.infs.LeaseManager;
 import com.setty.discovery.properties.DiscoveryProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
+import javax.annotation.PreDestroy;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.*;
@@ -22,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * create on 2019/7/5 18:33
  */
 @Slf4j
-@Configuration
+@ConditionalOnBean(annotation = EnableDiscoveryClient.class)
 @EnableConfigurationProperties(DiscoveryProperties.class)
 public class EnableDiscoveryConfiguration {
 
@@ -48,7 +50,7 @@ public class EnableDiscoveryConfiguration {
             vo.setHost(dp.getHost());
             vo.setPort(dp.getPort());
             vo.setInstanceName(dp.getInstanceName());
-            leaseManager().register(vo, dp.getLeaseDuration(), false);
+            leaseManager().register(vo, dp.getLeaseDuration(), dp.isRegistry());
 
             // 结束前一个执行后延迟的时间
             SCHEDULED.scheduleWithFixedDelay(() -> {
@@ -63,5 +65,15 @@ public class EnableDiscoveryConfiguration {
     @Bean
     public LeaseManager<AppVO, Long, String> leaseManager() {
         return new DefaultLeaseManager(dp);
+    }
+
+    /**
+     * 每个SpringApplication都会向JVM注册一个关闭钩子，以确保在退出时正常关闭ApplicationContext。
+     * 可以使用所有标准的Spring生命周期回调（例如DisposableBean接口或@PreDestroy注释）
+     */
+    @PreDestroy
+    public void destroy() {
+        // 注销服务
+        leaseManager().cancel(dp.getAppId(), dp.getInstanceName(), false);
     }
 }

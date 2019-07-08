@@ -34,4 +34,6 @@ public class DiscoveryProperties {
     private Integer port;
 
     private String instanceName = UUID.randomUUID().toString();
+
+    private boolean isRegistry = false;
 }

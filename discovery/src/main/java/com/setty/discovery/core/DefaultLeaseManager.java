@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -57,8 +58,15 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
                 log.info("注册到服务中心结果:{}", resp);
                 // 如果没有注册成功 放入任务队列
                 RegistryJsonResult result = JSON.parseObject(resp, RegistryJsonResult.class);
-                if (StringUtils.isBlank(resp) || result == null || result.getCode() != Apps.REGISTRY_APP_CODE + JsonResultCode.SUCCESS.getCode()) {
+                if (StringUtils.isBlank(resp) || result == null || !result.getCode().equals((Apps.REGISTRY_APP_CODE + Apps.REGISTRY_APP_CODE))) {
+                    if (result != null) {
+                        System.out.println(JsonResultCode.SUCCESS.getCode());
+                        System.out.println(Apps.REGISTRY_APP_CODE + JsonResultCode.SUCCESS.getCode());
+                        System.out.println(result.getCode());
+                        System.out.println(NumberUtils.compare(result.getCode(), Apps.REGISTRY_APP_CODE + JsonResultCode.SUCCESS.getCode()));
+                    }
                     // 如果队列满了 会直接返回false
+                    log.info("服务注册失败");
                     EnableDiscoveryConfiguration.RUN_QUEUE.offer(() -> register(vo, leaseDuration, isReplication));
                 }
                 // 注册成功 可以开始续约
@@ -96,6 +104,7 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
 
     @Override
     public boolean renewal(Long id, String name, boolean isReplication) {
+        log.info("服务续约:{},{},{}", id, name, isReplication);
         Assert.notNull(dp, "DiscoveryProperties can not be null");
         // 获取到注册中心服务端地址
         Map<String, String> serviceUrl = dp.getServiceUrl();

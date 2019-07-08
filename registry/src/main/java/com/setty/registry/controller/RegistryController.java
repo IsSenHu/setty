@@ -6,6 +6,7 @@ import com.setty.registry.service.RegistryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -26,12 +27,13 @@ public class RegistryController {
     /**
      * 注册新的应用实例
      *
-     * @param vo 应用实例数据模型
+     * @param vo      应用实例数据模型
+     * @param request HttpRequest
      * @return 注册结果
      */
     @PostMapping
-    public RegistryJsonResult registry(@RequestBody AppVO vo) {
-        return registryService.registry(vo);
+    public RegistryJsonResult registry(@RequestBody AppVO vo, HttpServletRequest request) {
+        return registryService.registry(vo, request);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.setty.registry.service;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.commons.vo.registry.RegistryJsonResult;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -14,10 +15,11 @@ public interface RegistryService {
     /**
      * 注册新的应用实例
      *
-     * @param vo 应用实例数据模型
+     * @param vo      应用实例数据模型
+     * @param request HttpServletRequest
      * @return 注册结果
      */
-    RegistryJsonResult registry(AppVO vo);
+    RegistryJsonResult registry(AppVO vo, HttpServletRequest request);
 
     /**
      * 注销应用实例
