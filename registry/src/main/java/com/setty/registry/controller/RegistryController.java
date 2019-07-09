@@ -1,5 +1,6 @@
 package com.setty.registry.controller;
 
+import com.setty.commons.vo.JsonResult;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.registry.service.RegistryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class RegistryController {
      * @return 注册结果
      */
     @PostMapping
-    public RegistryJsonResult registry(@RequestBody AppVO vo, HttpServletRequest request) {
+    public JsonResult registry(@RequestBody AppVO vo, HttpServletRequest request) {
         return registryService.registry(vo, request);
     }
 
@@ -43,7 +44,7 @@ public class RegistryController {
      * @return 注销结果
      */
     @DeleteMapping("/{appId}/{instanceName}")
-    public RegistryJsonResult logout(@PathVariable("appId") Long appId, @PathVariable("instanceName") String instanceName) {
+    public JsonResult logout(@PathVariable("appId") Long appId, @PathVariable("instanceName") String instanceName) {
         return registryService.logout(appId, instanceName);
     }
 
@@ -52,11 +53,12 @@ public class RegistryController {
      *
      * @param appId        appId
      * @param instanceName 实例名称
+     * @param request      HttpRequest
      * @return 注销结果
      */
     @PutMapping("/{appId}/{instanceName}")
-    public RegistryJsonResult renewal(@PathVariable("appId") Long appId, @PathVariable("instanceName") String instanceName) {
-        return registryService.renewal(appId, instanceName);
+    public JsonResult renewal(@PathVariable("appId") Long appId, @PathVariable("instanceName") String instanceName, HttpServletRequest request) {
+        return registryService.renewal(appId, instanceName, request);
     }
 
     /**
@@ -65,7 +67,7 @@ public class RegistryController {
      * @return 所有实例
      */
     @GetMapping("/apps")
-    public RegistryJsonResult<List<AppVO>> findAll() {
+    public JsonResult<List<AppVO>> findAll() {
         return registryService.findAll();
     }
 
@@ -76,7 +78,7 @@ public class RegistryController {
      * @return 指定 appId 的实例
      */
     @GetMapping("/apps/{appId}")
-    public RegistryJsonResult<List<AppVO>> findByAppId(@PathVariable("appId") Long appId) {
+    public JsonResult<List<AppVO>> findByAppId(@PathVariable("appId") Long appId) {
         return registryService.findByAppId(appId);
     }
 
@@ -88,7 +90,7 @@ public class RegistryController {
      * @return 实例
      */
     @GetMapping("/apps/{appId}/{instanceName}")
-    public RegistryJsonResult<AppVO> findByIdAndName(@PathVariable("appId") Long appId, @PathVariable("instanceName") String instanceName) {
+    public JsonResult<AppVO> findByIdAndName(@PathVariable("appId") Long appId, @PathVariable("instanceName") String instanceName) {
         return registryService.findByIdAndName(appId, instanceName);
     }
 

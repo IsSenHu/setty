@@ -2,9 +2,9 @@ package com.setty.discovery.core;
 
 import com.alibaba.fastjson.JSON;
 import com.setty.commons.cons.JsonResultCode;
-import com.setty.commons.cons.registry.Apps;
 import com.setty.commons.cons.registry.Header;
 import com.setty.commons.util.http.OkHttpUtil;
+import com.setty.commons.vo.JsonResult;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.commons.vo.registry.LeaseInfoVO;
 import com.setty.discovery.config.EnableDiscoveryConfiguration;
@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -56,21 +55,11 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
                 String resp = OkHttpUtil.postSync(s, body, headers);
                 log.info("注册到服务中心结果:{}", resp);
                 // 如果没有注册成功 放入任务队列
-                RegistryJsonResult result = JSON.parseObject(resp, RegistryJsonResult.class);
-                if (StringUtils.isBlank(resp) || result == null || !result.getCode().equals((Apps.REGISTRY_APP_CODE + Apps.REGISTRY_APP_CODE))) {
-                    if (result != null) {
-                        System.out.println(JsonResultCode.SUCCESS.getCode());
-                        System.out.println(Apps.REGISTRY_APP_CODE + JsonResultCode.SUCCESS.getCode());
-                        System.out.println(result.getCode());
-                        System.out.println(NumberUtils.compare(result.getCode(), Apps.REGISTRY_APP_CODE + JsonResultCode.SUCCESS.getCode()));
-                    }
+                JsonResult result = JSON.parseObject(resp, JsonResult.class);
+                if (StringUtils.isBlank(resp) || result == null || !result.getCode().equals(JsonResultCode.SUCCESS.getCode())) {
                     // 如果队列满了 会直接返回false
                     log.info("服务注册失败");
                     EnableDiscoveryConfiguration.RUN_QUEUE.offer(() -> register(vo, leaseDuration, isReplication));
-                }
-                // 注册成功 可以开始续约
-                else {
-                    EnableDiscoveryConfiguration.RUN_QUEUE.offer(() -> renewal(vo.getAppId(), vo.getInstanceName(), isReplication));
                 }
             }
         });
@@ -121,7 +110,7 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
                     s = s + "/" + id + "/" + name;
                 }
                 String resp = OkHttpUtil.putSync(s, headers);
-                log.info("服务续租结果:{}", resp);
+                log.info("服务续约结果:{}", resp);
             }
         });
         return true;

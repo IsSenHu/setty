@@ -50,7 +50,7 @@ public class EnableDiscoveryConfiguration {
             vo.setHost(dp.getHost());
             vo.setPort(dp.getPort());
             vo.setInstanceName(dp.getInstanceName());
-            leaseManager().register(vo, dp.getLeaseDuration(), dp.isRegistry());
+            leaseManager().register(vo, dp.getLeaseDuration(), dp.getIsRegistry());
 
             // 结束前一个执行后延迟的时间
             SCHEDULED.scheduleWithFixedDelay(() -> {
@@ -58,6 +58,7 @@ public class EnableDiscoveryConfiguration {
                 for (int i = 0; i < size; i++) {
                     Objects.requireNonNull(RUN_QUEUE.poll()).run();
                 }
+                leaseManager().renewal(vo.getAppId(), vo.getInstanceName(), dp.getIsRegistry());
             }, 10, dp.getRenewalIntervalInSecs(), TimeUnit.SECONDS);
         }
     }

@@ -1,5 +1,6 @@
 package com.setty.registry.service;
 
+import com.setty.commons.vo.JsonResult;
 import com.setty.commons.vo.registry.AppVO;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ public interface RegistryService {
      * @param request HttpServletRequest
      * @return 注册结果
      */
-    RegistryJsonResult registry(AppVO vo, HttpServletRequest request);
+    JsonResult registry(AppVO vo, HttpServletRequest request);
 
     /**
      * 注销应用实例
@@ -27,23 +28,24 @@ public interface RegistryService {
      * @param instanceName 实例名称
      * @return 注销结果
      */
-    RegistryJsonResult logout(Long appId, String instanceName);
+    JsonResult logout(Long appId, String instanceName);
 
     /**
      * 应用实例发送心跳 instance 不存在 返回404
      *
      * @param appId        appId
      * @param instanceName 实例名称
+     * @param request      HttpRequest
      * @return 注销结果
      */
-    RegistryJsonResult renewal(Long appId, String instanceName);
+    JsonResult renewal(Long appId, String instanceName, HttpServletRequest request);
 
     /**
      * 查询所有实例
      *
      * @return 所有实例
      */
-    RegistryJsonResult<List<AppVO>> findAll();
+    JsonResult<List<AppVO>> findAll();
 
     /**
      * 查询指定appId的实例
@@ -51,7 +53,7 @@ public interface RegistryService {
      * @param appId appId
      * @return 指定 appId 的实例
      */
-    RegistryJsonResult<List<AppVO>> findByAppId(Long appId);
+    JsonResult<List<AppVO>> findByAppId(Long appId);
 
     /**
      * 根据指定appId和instanceId查询
@@ -60,5 +62,5 @@ public interface RegistryService {
      * @param instanceName 实例名称
      * @return 实例
      */
-    RegistryJsonResult<AppVO> findByIdAndName(Long appId, String instanceName);
+    JsonResult<AppVO> findByIdAndName(Long appId, String instanceName);
 }

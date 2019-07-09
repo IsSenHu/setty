@@ -35,5 +35,5 @@ public class DiscoveryProperties {
 
     private String instanceName = UUID.randomUUID().toString();
 
-    private boolean isRegistry = false;
+    private Boolean isRegistry = false;
 }
