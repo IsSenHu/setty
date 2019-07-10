@@ -8,7 +8,7 @@ import com.setty.commons.vo.registry.AppVO;
 import com.setty.commons.vo.registry.LeaseInfoVO;
 import com.setty.discovery.core.infs.LeaseManager;
 import com.setty.discovery.properties.DiscoveryProperties;
-import com.setty.registry.model.AppDao;
+import com.setty.discovery.model.AppDao;
 import com.setty.registry.service.RegistryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,6 @@ public class RegistryServiceImpl implements RegistryService {
         if (dp.getInstanceName().equals(instanceName)) {
             return ResultMsgFactory.create(JsonResultCode.SUCCESS);
         }
-        log.info("{}", instanceName);
         AppVO found = appDao.findByIdAndName(appId, instanceName);
         if (found == null) {
             return ResultMsgFactory.create(JsonResultCode.NOT_FOUND);

@@ -1,10 +1,9 @@
-package com.setty.registry.model;
+package com.setty.discovery.model;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import com.setty.commons.vo.registry.AppVO;
-import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.Map;
  * @author HuSen
  * create on 2019/7/5 14:54
  */
-@Repository
 public class AppDao {
 
     public AppVO findByIdAndName(Long appId, String instanceName) {

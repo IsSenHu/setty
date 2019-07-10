@@ -10,3 +10,5 @@ setty:
     service-url:
       default-zone:
         http://127.0.0.1:10003/api/registry
+  base:
+    app-code: 10000

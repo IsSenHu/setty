@@ -1,9 +1,11 @@
 package com.setty.discovery.config;
 
+import com.alibaba.fastjson.JSON;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.discovery.annotation.EnableDiscoveryClient;
 import com.setty.discovery.core.DefaultLeaseManager;
 import com.setty.discovery.core.infs.LeaseManager;
+import com.setty.discovery.model.AppDao;
 import com.setty.discovery.properties.DiscoveryProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 
 import javax.annotation.PreDestroy;
+import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.*;
@@ -60,12 +63,25 @@ public class EnableDiscoveryConfiguration {
                 }
                 leaseManager().renewal(vo.getAppId(), vo.getInstanceName(), dp.getIsRegistry());
             }, 10, dp.getRenewalIntervalInSecs(), TimeUnit.SECONDS);
+
+            if (dp.getIsRegistry()) {
+                SCHEDULED.scheduleWithFixedDelay(() -> leaseManager().evit(), 10, 10, TimeUnit.MILLISECONDS);
+                SCHEDULED.scheduleWithFixedDelay(() -> {
+                    List<AppVO> all = appDao().findAll();
+                    log.info("当前所注册的服务有:{}", JSON.toJSONString(all, true));
+                }, 10, 60, TimeUnit.SECONDS);
+            }
         }
     }
 
     @Bean
     public LeaseManager<AppVO, Long, String> leaseManager() {
-        return new DefaultLeaseManager(dp);
+        return new DefaultLeaseManager(dp, appDao());
+    }
+
+    @Bean
+    public AppDao appDao() {
+        return new AppDao();
     }
 
     /**

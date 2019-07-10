@@ -118,7 +118,7 @@ public class OkHttpUtil {
             }
             return body.string();
         } catch (Exception e) {
-            log.error("请求异常:", e);
+            log.error("请求到指定地址发送错误:{}", call.request().url());
         }
         return null;
     }

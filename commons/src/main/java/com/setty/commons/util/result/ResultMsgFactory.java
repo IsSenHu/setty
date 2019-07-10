@@ -15,18 +15,18 @@ public class ResultMsgFactory {
     }
 
     public static <T> JsonResult<T> create(T t) {
-        return new JsonResult<>(t);
+        return new JsonResult<>(t).appCode(appCode);
     }
 
     public static <T> JsonResult<T> create(Integer code, String message, T data) {
-        return new JsonResult<>(appCode + code, message, data);
+        return new JsonResult<>(code.equals(JsonResultCode.SUCCESS.getCode()) ? code : appCode + code, message, data).appCode(appCode);
     }
 
-    public static <T> JsonResult<T> create(Integer code, String message) {
-        return new JsonResult<>(code, message);
+    public static JsonResult<Object> create(Integer code, String message) {
+        return new JsonResult<>(code.equals(JsonResultCode.SUCCESS.getCode()) ? code : appCode + code, message).appCode(appCode);
     }
 
-    public static <T> JsonResult<T> create(JsonResultCode code) {
-        return new JsonResult<>(code);
+    public static JsonResult<Object> create(JsonResultCode code) {
+        return new JsonResult<>(code == JsonResultCode.SUCCESS ? code.getCode() : appCode + code.getCode(), code.getMessage()).appCode(appCode);
     }
 }

@@ -25,17 +25,6 @@
 
         <dependency>
             <groupId>com.setty</groupId>
-            <artifactId>commons</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.setty</groupId>
             <artifactId>discovery</artifactId>
             <version>1.0.0</version>
         </dependency>
