@@ -3,9 +3,11 @@ package com.setty.rpc.config.proto;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.discovery.core.infs.LookupService;
 import com.setty.rpc.annotation.proto.EnableProtoClient;
+import com.setty.rpc.client.ProtoClientServer;
 import com.setty.rpc.pool.map.ProtoChannelPoolMap;
 import com.setty.rpc.properties.proto.ClientP;
 import com.setty.rpc.properties.proto.ClientProperties;
+import com.setty.rpc.select.impl.RoundRobinSelector;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -44,9 +46,19 @@ public class EnableProtoClientAutoConfiguration {
     public ProtoChannelPoolMap protoChannelPoolMap() {
         // 初始化时 拉取所有的服务
         List<Map<Long, AppVO>> applications = lookupService.getApplications();
+        // 根据目前有的服务 生成Client
+        applications.stream().map(app -> app.values().iterator()).forEach(iterator -> {
+            if (iterator.hasNext()) {
+                AppVO next = iterator.next();
+                ProtoClientServer client = new ProtoClientServer(next.getHost(), next.getPort(), next.getInstanceName(), next.getAppId(), cp.getConnectionTimeout());
+
+            }
+        });
+
         Map<String, ClientP> clients = new HashMap<>(applications.size());
+        // 轮询选择
+        RoundRobinSelector selector = new RoundRobinSelector();
         applications.forEach(app -> {
-            Long appId = app.keySet().iterator().next();
             AppVO vo = app.values().iterator().next();
             ClientP p = new ClientP();
             p.setAppId(vo.getAppId());
@@ -54,7 +66,9 @@ public class EnableProtoClientAutoConfiguration {
             p.setPort(vo.getPort());
             p.setConnectionTimeout(cp.getConnectionTimeout());
             clients.put(vo.getInstanceName(), p);
+            selector.join(vo);
         });
+        selector.buildFinish();
         ProtoChannelPoolMap poolMap = new ProtoChannelPoolMap(clients);
         poolMap.start();
         return poolMap;

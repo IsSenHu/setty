@@ -29,9 +29,9 @@ public class ProtoProxy implements InvocationHandler {
 
     Object bind(Class<?> cls) {
         this.interfaceClass = cls;
-        // 保存 ProtoClient 和 class 的绑定关系
+        // 保存 ProtoClientServer 和 class 的绑定关系
         ProtoClient protoClient = AnnotationUtils.findAnnotation(cls, ProtoClient.class);
-        Assert.notNull(protoClient, "@ProtoClient is need");
+        Assert.notNull(protoClient, "@ProtoClientServer is need");
         ProtoCache.addProtoClient(cls, protoClient);
 
         // 保存 ClientP 和 Method 的绑定关系

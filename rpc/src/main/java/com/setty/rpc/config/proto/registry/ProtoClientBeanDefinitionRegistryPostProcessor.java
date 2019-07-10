@@ -47,7 +47,7 @@ public class ProtoClientBeanDefinitionRegistryPostProcessor implements BeanDefin
      * @param beanDefinitionRegistry BeanDefinitionRegistry
      */
     private void registryClient(@NonNull BeanDefinitionRegistry beanDefinitionRegistry) {
-        log.info("开始注册 ProtoClient 动态代理类 ^_^ ^_^ ^_^");
+        log.info("开始注册 ProtoClientServer 动态代理类 ^_^ ^_^ ^_^");
         clientClasses.forEach(pc -> {
             ProtoClient protoClient = AnnotationUtils.findAnnotation(pc, ProtoClient.class);
             if (protoClient != null) {
@@ -58,14 +58,14 @@ public class ProtoClientBeanDefinitionRegistryPostProcessor implements BeanDefin
                 BeanDefinitionReaderUtils.registerBeanDefinition(holder, beanDefinitionRegistry);
             }
         });
-        log.info("注册完成 ProtoClient 动态代理类:{}", clientClasses);
+        log.info("注册完成 ProtoClientServer 动态代理类:{}", clientClasses);
     }
 
     /**
      * 加载类
      */
     private void loadClientClass() {
-        log.info("开始加载 ProtoClient 类 ^_^ ^_^ ^_^");
+        log.info("开始加载 ProtoClientServer 类 ^_^ ^_^ ^_^");
         // 获取到所有的EnableProtoClient注解的类
         Map<String, Object> clientsWithAnnotation = context.getBeansWithAnnotation(EnableProtoClient.class);
         clientsWithAnnotation.values().forEach(epc -> {
@@ -79,7 +79,7 @@ public class ProtoClientBeanDefinitionRegistryPostProcessor implements BeanDefin
                 SpringClassUtil.loadClassByPackage(packages, resourceLoader, clientClasses);
             }
         });
-        log.info("加载 ProtoClient 类完成:{}", clientClasses);
+        log.info("加载 ProtoClientServer 类完成:{}", clientClasses);
     }
 
     /**

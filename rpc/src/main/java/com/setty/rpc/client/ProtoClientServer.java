@@ -1,5 +1,6 @@
 package com.setty.rpc.client;
 
+import com.setty.rpc.cache.proto.ProtoCache;
 import com.setty.rpc.handler.proto.client.LifeCycleHandler;
 import com.setty.rpc.handler.proto.client.ProtoCodec;
 import com.setty.rpc.handler.proto.client.ProtoResponseHandler;
@@ -12,12 +13,14 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.Getter;
 
 /**
  * @author HuSen
  * create on 2019/7/5 11:55
  */
-public class ProtoClient {
+@Getter
+public class ProtoClientServer {
     private final NioEventLoopGroup group;
     private final String host;
     private final int port;
@@ -25,7 +28,7 @@ public class ProtoClient {
     private final long appId;
     private final int connectionTimeout;
 
-    public ProtoClient(String host, int port, String key, long appId, int connectionTimeout) {
+    public ProtoClientServer(String host, int port, String key, long appId, int connectionTimeout) {
         this.host = host;
         this.port = port;
         this.key = key;

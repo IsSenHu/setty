@@ -3,6 +3,7 @@ package com.setty.rpc.cache.proto;
 import com.setty.rpc.annotation.proto.Client;
 import com.setty.rpc.annotation.proto.ProtoClient;
 import com.setty.rpc.callback.proto.ProtoCallback;
+import com.setty.rpc.client.ProtoClientServer;
 import io.netty.channel.Channel;
 import io.netty.channel.pool.FixedChannelPool;
 
@@ -66,7 +67,7 @@ public class ProtoCache {
     }
 
     /**
-     * ProtoClient 缓存
+     * ProtoClientServer 缓存
      */
     private static final Map<Class<?>, ProtoClient> PROTO_CLIENT_CACHE = new HashMap<>();
 
@@ -115,6 +116,16 @@ public class ProtoCache {
 
     public static List<Channel> getChannels(Long appId) {
         return APP_ID_CAHNNEL_CACHE.get(appId);
+    }
+
+    private static final Map<String, ProtoClientServer> KEY_P_CLIENT_CACHE = new HashMap<>();
+
+    public static void addProtoClient(ProtoClientServer client) {
+        KEY_P_CLIENT_CACHE.put(client.getKey(), client);
+    }
+
+    public static ProtoClientServer getProtoClient(String key) {
+        return KEY_P_CLIENT_CACHE.get(key);
     }
 
     private static <T, S> void addItem(Map<T, List<S>> map, S item, T key) {
