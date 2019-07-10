@@ -2,6 +2,7 @@ package com.setty.discovery.core;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import com.setty.commons.cons.JsonResultCode;
 import com.setty.commons.cons.registry.Header;
@@ -16,7 +17,7 @@ import com.setty.discovery.model.AppDao;
 import com.setty.discovery.properties.DiscoveryProperties;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
-import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
@@ -35,6 +36,7 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
     private static final String URL_SPLIT = "/";
 
     private static final Table<Long, String, AppVO> TB_APP = HashBasedTable.create();
+    private static final Table<String, Long, String> TB_URL_APP = HashBasedTable.create();
 
     private final DiscoveryProperties dp;
 
@@ -47,82 +49,94 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
 
     @Override
     public void register(AppVO vo, int leaseDuration, boolean isReplication) {
-        Assert.notNull(dp, "DiscoveryProperties can not be null");
-        // 获取到注册中心服务端地址
-        Map<String, String> serviceUrl = dp.getServiceUrl();
-        if (MapUtils.isEmpty(serviceUrl)) {
-            return;
+        Set<String> targetUrls = getTargetUrls();
+        if (CollectionUtils.isEmpty(targetUrls)) {
+            log.warn("not have enable url");
         }
+        targetUrls.forEach(url -> register(vo, leaseDuration, isReplication, url));
+    }
 
-        serviceUrl.forEach((zone, urls) -> {
-            Assert.isTrue(StringUtils.isNotBlank(urls), "serviceUrl can not be empty");
-            String[] split = urls.split(",");
-            for (String url : split) {
-                register(vo, leaseDuration, isReplication, url);
+    private Set<String> getTargetUrls() {
+        Set<String> ret = new HashSet<>();
+        Assert.notNull(dp, "DiscoveryProperties can not be null");
+        // 只注册到自己区域的zone上去
+        String region = dp.getRegion();
+        String zoneStr;
+        if (StringUtils.equals(region, DiscoveryProperties.DEFAULT_REGION)) {
+            zoneStr = DiscoveryProperties.DEFAULT_ZONE;
+        } else {
+            zoneStr = dp.getAvailabilityZones().get(region);
+            Assert.isTrue(StringUtils.isNotBlank(zoneStr), region + "'s zone is empty");
+        }
+        // 获取指定zone的服务注册地址
+        String[] zones = zoneStr.split(",");
+        for (String zone : zones)
+        {
+            // 过滤掉自己
+            if (StringUtils.equals(zone, dp.getZone())) {
+                continue;
             }
-        });
+            String urlStr = dp.getServiceUrl().get(zone);
+            Assert.isTrue(StringUtils.isNotBlank(urlStr), zone + "'s urls is empty");
+            String[] urls = urlStr.split(",");
+            ret.addAll(Sets.newHashSet(urls));
+        }
+        return ret;
     }
 
     private void register(AppVO vo, int leaseDuration, boolean isReplication, String url) {
         Headers headers = getPairs(isReplication);
         String body = JSON.toJSONString(vo);
         String resp = OkHttpUtil.postSync(url, body, headers);
-        log.info("注册到服务中心结果:{}", resp);
         // 如果没有注册成功 放入任务队列
         JsonResult result = JSON.parseObject(resp, JsonResult.class);
         if (StringUtils.isBlank(resp) || result == null || !result.getCode().equals(JsonResultCode.SUCCESS.getCode())) {
             // 如果队列满了 会直接返回false
-            log.info("服务注册失败");
-            EnableDiscoveryConfiguration.RUN_QUEUE.offer(() -> register(vo, leaseDuration, isReplication));
+            log.warn("服务注册到:{} 失败", url);
+            EnableDiscoveryConfiguration.RUN_QUEUE.offer(() -> register(vo, leaseDuration, isReplication, url));
         } else {
+            log.info("服务注册到:{} 成功", url);
             TB_APP.put(vo.getAppId(), vo.getInstanceName(), vo);
+            TB_URL_APP.put(url, vo.getAppId(), vo.getInstanceName());
         }
     }
 
     @Override
     public boolean cancel(Long id, String name, boolean isReplication) {
-        Assert.notNull(dp, "DiscoveryProperties can not be null");
-        // 获取到注册中心服务端地址
-        Map<String, String> serviceUrl = dp.getServiceUrl();
-        if (MapUtils.isEmpty(serviceUrl)) {
-            return true;
+        Set<String> targetUrls = getTargetUrls();
+        if (CollectionUtils.isEmpty(targetUrls)) {
+            log.warn("not have enable url");
         }
-        serviceUrl.forEach((zone, urls) -> {
-            Assert.isTrue(StringUtils.isNotBlank(urls), "serviceUrl can not be empty");
-            Headers headers = getPairs(isReplication);
-            String[] split = urls.split(",");
-            for (String url : split) {
-                if (url.endsWith(URL_SPLIT)) {
-                    url = url + id + URL_SPLIT + name;
-                } else {
-                    url = url + URL_SPLIT + id + URL_SPLIT + name;
-                }
-                String resp = OkHttpUtil.deleteSync(url, headers);
-                log.info("服务下线结果:{}", resp);
+        Headers headers = getPairs(isReplication);
+        targetUrls.forEach(url -> {
+            if (url.endsWith(URL_SPLIT)) {
+                url = url + id + URL_SPLIT + name;
+            } else {
+                url = url + URL_SPLIT + id + URL_SPLIT + name;
             }
+            String resp = OkHttpUtil.deleteSync(url, headers);
+            log.info("服务下线结果:{}", resp);
         });
         return true;
     }
 
     @Override
     public boolean renewal(Long id, String name, boolean isReplication) {
-        Assert.notNull(dp, "DiscoveryProperties can not be null");
-        // 获取到注册中心服务端地址
-        Map<String, String> serviceUrl = dp.getServiceUrl();
-        if (MapUtils.isEmpty(serviceUrl)) {
-            return true;
+        Set<String> targetUrls = getTargetUrls();
+        if (CollectionUtils.isEmpty(targetUrls)) {
+            log.warn("not have enable url");
         }
-        serviceUrl.forEach((zone, urls) -> {
-            Assert.isTrue(StringUtils.isNotBlank(urls), "serviceUrl can not be empty");
-            String[] split = urls.split(",");
-            for (String url : split) {
-                renewal(id, name, isReplication, url);
-            }
-        });
+        targetUrls.forEach(url -> renewal(id, name, isReplication, url));
         return true;
     }
 
     private void renewal(Long id, String name, boolean isReplication, String url) {
+        // 成功之后才能续租
+        boolean contains = TB_URL_APP.contains(url, id);
+        if (!contains) {
+            log.warn("服务还没有注册成功，不能续约到:{}", url);
+            return;
+        }
         String temp = url;
         if (url.endsWith(URL_SPLIT)) {
             url = url + id + URL_SPLIT + name;

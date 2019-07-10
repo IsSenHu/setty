@@ -1,0 +1,19 @@
+server:
+  port: 10005
+setty:
+  discovery:
+    app-id: 100000000
+    host: 127.0.0.1
+    port: ${server.port}
+    instance-name: REGISTRY_5
+    is-registry: true
+    service-url:
+      zone3: http://127.0.0.1:10003/api/registry
+      zone4: http://127.0.0.1:10004/api/registry
+      zone5: http://127.0.0.1:10005/api/registry
+    zone: zone5
+    region: china-east
+    availability-zones:
+      china-east: zone3,zone4,zone5
+  base:
+    app-code: 10000

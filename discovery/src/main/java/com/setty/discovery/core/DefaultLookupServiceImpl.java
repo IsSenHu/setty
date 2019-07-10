@@ -2,7 +2,7 @@ package com.setty.discovery.core;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.setty.commons.cons.JsonResultCode;
 import com.setty.commons.util.http.OkHttpUtil;
 import com.setty.commons.util.result.ResultEqualUtil;
@@ -10,8 +10,8 @@ import com.setty.commons.vo.JsonResult;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.discovery.core.infs.LookupService;
 import com.setty.discovery.properties.DiscoveryProperties;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
 import java.util.*;
 
@@ -29,23 +29,27 @@ public class DefaultLookupServiceImpl implements LookupService<AppVO, Long> {
         this.dp = dp;
     }
 
+    private Set<String> getTargetUrls() {
+        // 优先获取自己所属的zone的服务
+        String zone = dp.getZone();
+        Assert.isTrue(StringUtils.isNotBlank(zone), "region is empty");
+        Map<String, String> serviceUrl = dp.getServiceUrl();
+        String urlStr = serviceUrl.get(zone);
+        Assert.isTrue(StringUtils.isNotBlank(urlStr), zone + "'s urls is empty");
+        String[] urls = urlStr.split(",");
+        return new HashSet<>(Sets.newHashSet(urls));
+    }
+
     @Override
     public List<AppVO> getApplication(Long id) {
-        Map<String, String> serviceUrl = dp.getServiceUrl();
-        if (MapUtils.isEmpty(serviceUrl)) {
-            return Lists.newArrayList();
-        }
         Map<String, AppVO> nameMap = new HashMap<>(16);
-        serviceUrl.values().forEach(urls -> {
-            String[] split = urls.split(",");
-            for (String url : split) {
-                if (url.endsWith(URL_SPLIT)) {
-                    url = url + "apps/" + id;
-                } else {
-                    url = url + URL_SPLIT + "apps/" + id;
-                }
-                getApplication(nameMap, url);
+        getTargetUrls().forEach(url -> {
+            if (url.endsWith(URL_SPLIT)) {
+                url = url + "apps/" + id;
+            } else {
+                url = url + URL_SPLIT + "apps/" + id;
             }
+            getApplication(nameMap, url);
         });
         return new ArrayList<>(nameMap.values());
     }
@@ -68,22 +72,15 @@ public class DefaultLookupServiceImpl implements LookupService<AppVO, Long> {
 
     @Override
     public List<Map<Long, AppVO>> getApplications() {
-        Map<String, String> serviceUrl = dp.getServiceUrl();
-        if (MapUtils.isEmpty(serviceUrl)) {
-            return Lists.newArrayList();
-        }
         Map<String, AppVO> nameMap = new HashMap<>(16);
         List<Map<Long, AppVO>> ret = new ArrayList<>();
-        serviceUrl.values().forEach(urls -> {
-            String[] split = urls.split(",");
-            for (String url : split) {
-                if (url.endsWith(URL_SPLIT)) {
-                    url = url + "apps";
-                } else {
-                    url = url + URL_SPLIT + "apps";
-                }
-                getApplication(nameMap, url);
+        getTargetUrls().forEach(url -> {
+            if (url.endsWith(URL_SPLIT)) {
+                url = url + "apps";
+            } else {
+                url = url + URL_SPLIT + "apps";
             }
+            getApplication(nameMap, url);
         });
         nameMap.forEach((name, app) -> {
             Map<Long, AppVO> map = new HashMap<>(1);

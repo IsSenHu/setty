@@ -117,6 +117,8 @@ public class EnableDiscoveryConfiguration {
         leaseInfoVO.setRenewalIntervalInSecs(dp.getRenewalIntervalInSecs());
         vo.setLeaseInfo(leaseInfoVO);
         vo.setLastDirtyTimestamp(System.currentTimeMillis());
+        vo.setRegion(dp.getRegion());
+        vo.setZone(dp.getZone());
         return vo;
     }
 }
