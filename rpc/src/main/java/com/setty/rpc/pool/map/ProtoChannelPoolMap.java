@@ -25,6 +25,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class ProtoChannelPoolMap extends AbstractChannelPoolMap<String, FixedChannelPool> {
 
+    /**
+     * instanceName => client
+     * */
     private final Map<String, ClientP> clientMap;
 
     private final NioEventLoopGroup group;

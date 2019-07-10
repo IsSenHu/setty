@@ -17,4 +17,6 @@ import java.util.Map;
 @Component
 public class ClientProperties {
     private Map<String, ClientP> clients;
+
+    private Integer connectionTimeout = 2000;
 }

@@ -7,8 +7,6 @@ import com.setty.rpc.cache.proto.ProtoCache;
 import com.setty.rpc.cons.proto.Id;
 import com.setty.rpc.handler.proto.server.ProtoCodec;
 import com.setty.rpc.handler.proto.server.ProtoDispatcherHandler;
-import com.setty.rpc.pool.map.ProtoChannelPoolMap;
-import com.setty.rpc.pool.proto.ProtoChannelPoolHandler;
 import com.setty.rpc.properties.proto.ServerProperties;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -21,7 +19,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
@@ -37,7 +34,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author HuSen
  * create on 2019/7/3 15:22
  */
-@Configuration
 @ConditionalOnBean(annotation = EnableProtoServer.class)
 @EnableConfigurationProperties(ServerProperties.class)
 public class EnableProtoServerAutoConfiguration {

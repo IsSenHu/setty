@@ -14,14 +14,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.setty</groupId>
-            <artifactId>commons</artifactId>
-            <version>1.0.0</version>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
+            <groupId>com.setty</groupId>
+            <artifactId>discovery</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 
