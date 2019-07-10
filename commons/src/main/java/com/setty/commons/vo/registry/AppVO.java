@@ -23,6 +23,7 @@ public class AppVO implements Serializable {
     private String host;
     private Integer port;
     private String instanceName;
+    private Long lastDirtyTimestamp;
 
     /**
      * 租约信息

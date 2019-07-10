@@ -2,9 +2,12 @@ package com.setty.discovery.config;
 
 import com.alibaba.fastjson.JSON;
 import com.setty.commons.vo.registry.AppVO;
+import com.setty.commons.vo.registry.LeaseInfoVO;
 import com.setty.discovery.annotation.EnableDiscoveryClient;
 import com.setty.discovery.core.DefaultLeaseManager;
+import com.setty.discovery.core.DefaultLookupServiceImpl;
 import com.setty.discovery.core.infs.LeaseManager;
+import com.setty.discovery.core.infs.LookupService;
 import com.setty.discovery.model.AppDao;
 import com.setty.discovery.properties.DiscoveryProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -48,11 +51,7 @@ public class EnableDiscoveryConfiguration {
     public void init() {
         if (!init.getAndSet(true)) {
             // 将自己信息注册到注册中心
-            AppVO vo = new AppVO();
-            vo.setAppId(dp.getAppId());
-            vo.setHost(dp.getHost());
-            vo.setPort(dp.getPort());
-            vo.setInstanceName(dp.getInstanceName());
+            AppVO vo = buildApp();
             leaseManager().register(vo, dp.getLeaseDuration(), dp.getIsRegistry());
 
             // 结束前一个执行后延迟的时间
@@ -61,7 +60,10 @@ public class EnableDiscoveryConfiguration {
                 for (int i = 0; i < size; i++) {
                     Objects.requireNonNull(RUN_QUEUE.poll()).run();
                 }
-                leaseManager().renewal(vo.getAppId(), vo.getInstanceName(), dp.getIsRegistry());
+                boolean renewal = leaseManager().renewal(vo.getAppId(), vo.getInstanceName(), dp.getIsRegistry());
+                if (log.isDebugEnabled()) {
+                    log.debug("本应用续约结果:{}", renewal);
+                }
             }, 10, dp.getRenewalIntervalInSecs(), TimeUnit.SECONDS);
 
             if (dp.getIsRegistry()) {
@@ -71,12 +73,19 @@ public class EnableDiscoveryConfiguration {
                     log.info("当前所注册的服务有:{}", JSON.toJSONString(all, true));
                 }, 10, 60, TimeUnit.SECONDS);
             }
+
+            SCHEDULED.schedule(() -> lookupService().getApplications(), 10, TimeUnit.SECONDS);
         }
     }
 
     @Bean
     public LeaseManager<AppVO, Long, String> leaseManager() {
         return new DefaultLeaseManager(dp, appDao());
+    }
+
+    @Bean
+    public LookupService<AppVO, Long> lookupService() {
+        return new DefaultLookupServiceImpl(dp);
     }
 
     @Bean
@@ -91,6 +100,23 @@ public class EnableDiscoveryConfiguration {
     @PreDestroy
     public void destroy() {
         // 注销服务
-        leaseManager().cancel(dp.getAppId(), dp.getInstanceName(), false);
+        boolean cancel = leaseManager().cancel(dp.getAppId(), dp.getInstanceName(), false);
+        if (log.isDebugEnabled()) {
+            log.debug("cancel self {}", cancel);
+        }
+    }
+
+    private AppVO buildApp() {
+        AppVO vo = new AppVO();
+        vo.setAppId(dp.getAppId());
+        vo.setHost(dp.getHost());
+        vo.setPort(dp.getPort());
+        vo.setInstanceName(dp.getInstanceName());
+        LeaseInfoVO leaseInfoVO = new LeaseInfoVO();
+        leaseInfoVO.setDurationInSecs(dp.getLeaseDuration());
+        leaseInfoVO.setRenewalIntervalInSecs(dp.getRenewalIntervalInSecs());
+        vo.setLeaseInfo(leaseInfoVO);
+        vo.setLastDirtyTimestamp(System.currentTimeMillis());
+        return vo;
     }
 }

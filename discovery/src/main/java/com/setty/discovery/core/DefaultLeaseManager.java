@@ -1,6 +1,8 @@
 package com.setty.discovery.core;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.setty.commons.cons.JsonResultCode;
 import com.setty.commons.cons.registry.Header;
 import com.setty.commons.util.http.OkHttpUtil;
@@ -32,6 +34,8 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
 
     private static final String URL_SPLIT = "/";
 
+    private static final Table<Long, String, AppVO> TB_APP = HashBasedTable.create();
+
     private final DiscoveryProperties dp;
 
     private final AppDao appDao;
@@ -49,10 +53,6 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
         if (MapUtils.isEmpty(serviceUrl)) {
             return;
         }
-        LeaseInfoVO leaseInfoVO = new LeaseInfoVO();
-        leaseInfoVO.setDurationInSecs(leaseDuration);
-        leaseInfoVO.setRenewalIntervalInSecs(dp.getRenewalIntervalInSecs());
-        vo.setLeaseInfo(leaseInfoVO);
 
         serviceUrl.forEach((zone, urls) -> {
             Assert.isTrue(StringUtils.isNotBlank(urls), "serviceUrl can not be empty");
@@ -74,6 +74,8 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
             // 如果队列满了 会直接返回false
             log.info("服务注册失败");
             EnableDiscoveryConfiguration.RUN_QUEUE.offer(() -> register(vo, leaseDuration, isReplication));
+        } else {
+            TB_APP.put(vo.getAppId(), vo.getInstanceName(), vo);
         }
     }
 
@@ -133,16 +135,10 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
         JsonResult jsonResult = JSON.parseObject(resp, JsonResult.class);
         boolean equal = ResultEqualUtil.equal(jsonResult, JsonResultCode.NOT_FOUND);
         if (StringUtils.isNotBlank(resp) && jsonResult != null && equal) {
-            AppVO vo = new AppVO();
-            vo.setAppId(dp.getAppId());
-            vo.setHost(dp.getHost());
-            vo.setPort(dp.getPort());
-            vo.setInstanceName(dp.getInstanceName());
-            LeaseInfoVO leaseInfoVO = new LeaseInfoVO();
-            leaseInfoVO.setDurationInSecs(dp.getLeaseDuration());
-            leaseInfoVO.setRenewalIntervalInSecs(dp.getRenewalIntervalInSecs());
-            vo.setLeaseInfo(leaseInfoVO);
-            register(vo, dp.getLeaseDuration(), dp.getIsRegistry(), temp);
+            AppVO vo = TB_APP.get(id, name);
+            if (vo != null) {
+                register(vo, dp.getLeaseDuration(), dp.getIsRegistry(), temp);
+            }
         }
     }
 

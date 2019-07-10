@@ -44,20 +44,29 @@ public class RegistryServiceImpl implements RegistryService {
         if (dp.getInstanceName().equals(vo.getInstanceName())) {
             return ResultMsgFactory.create(JsonResultCode.SUCCESS);
         }
+        // 是否是复制请求
+        boolean isReplication = request.getHeader(Header.REGISTRY_IS_REPLICATION) == null;
+        AppVO found = appDao.findByIdAndName(vo.getAppId(), vo.getInstanceName());
+        // 初始化租约信息
         LeaseInfoVO leaseInfo = vo.getLeaseInfo();
         long now = System.currentTimeMillis();
         // 服务第一次注册时间
         leaseInfo.setRegistrationTimestamp(now);
         // 服务标记为UP的时间
         leaseInfo.setServiceUpTimestamp(now);
-        AppVO found = appDao.findByIdAndName(vo.getAppId(), vo.getInstanceName());
-        if (found == null) {
+        if (found == null)
+        {
             appDao.insert(vo);
-        } else {
-            appDao.update(vo);
+        }
+        else
+        {
+            if (vo.getLastDirtyTimestamp() > found.getLastDirtyTimestamp())
+            {
+                appDao.update(vo);
+            }
         }
         // 如果带有请求头 REGISTRY_IS_REPLICATION 则说明是复制请求 不再复制给其他节点
-        if (request.getHeader(Header.REGISTRY_IS_REPLICATION) == null) {
+        if (isReplication) {
             leaseManager.register(vo, leaseInfo.getDurationInSecs(), true);
         }
         return ResultMsgFactory.create(JsonResultCode.SUCCESS);
