@@ -28,7 +28,6 @@ public class AvgWeightRoundRobinSelector implements ServiceSelector {
     public String select(Long appId) {
         Integer now = idTotal.get(appId);
         List<Server> servers = idServers.get(appId);
-        long l = System.nanoTime();
         for (Server server : servers) {
             server.currentWeight += server.weight;
         }
