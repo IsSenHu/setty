@@ -30,4 +30,11 @@ public interface ServiceSelector extends SelectData {
      * 构建完成触发
      */
     void buildFinish();
+
+    /**
+     * 是否初始化完成
+     *
+     * @return 是否可用
+     */
+    boolean validate();
 }

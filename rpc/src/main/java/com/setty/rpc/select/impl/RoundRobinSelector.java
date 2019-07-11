@@ -34,6 +34,7 @@ public class RoundRobinSelector implements ServiceSelector {
         buildFinished = true;
     }
 
+    @Override
     public boolean validate() {
         return buildFinished;
     }

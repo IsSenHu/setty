@@ -4,14 +4,12 @@ import com.setty.commons.util.math.MathUtil;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.rpc.select.ServiceSelector;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
- * 带权重的轮询算法
+ * 带权重的轮询算法 不均匀
  *
  * @author HuSen
  * create on 2019/7/11 14:47
@@ -22,11 +20,13 @@ public class WeightRoundRobinSelector implements ServiceSelector {
 
     private final Map<Long, Integer[]> ID_WEIGHTS = new HashMap<>();
 
-    private final Map<Long, Map<Integer, String>> ID_WEIGHT_NAME = new HashMap<>();
+    private final Map<Long, List<Map<String, Integer>>> ID_NAME_WEIGHT_LIST = new HashMap<>();
 
     private final Map<Long, AtomicInteger> ID_CUR_WEIGHT = new HashMap<>();
 
     private final Map<Long, Integer> ID_MAX_WEIGHT = new HashMap<>();
+
+    private boolean finish = false;
 
     /**
      * 最大公约数
@@ -35,6 +35,7 @@ public class WeightRoundRobinSelector implements ServiceSelector {
 
     @Override
     public String select(Long appId) {
+        List<Map<String, Integer>> list = ID_NAME_WEIGHT_LIST.get(appId);
         AtomicInteger index = ID_INDEX.get(appId);
         if (index.get() == -1) {
             index.incrementAndGet();
@@ -42,7 +43,7 @@ public class WeightRoundRobinSelector implements ServiceSelector {
         Integer[] weights = ID_WEIGHTS.get(appId);
         Integer gcd = ID_GCD.get(appId);
         AtomicInteger currentWeight = ID_CUR_WEIGHT.get(appId);
-        if (index.get() == weights.length) {
+        if (index.get() == list.size()) {
             index.set(0);
             int ncw = currentWeight.addAndGet(-gcd);
             if (ncw == 0) {
@@ -50,10 +51,11 @@ public class WeightRoundRobinSelector implements ServiceSelector {
             }
         }
         int i;
-        while ((i = index.getAndIncrement()) < weights.length) {
-            Integer weight = weights[i];
+        while ((i = index.getAndIncrement()) < list.size()) {
+            Map<String, Integer> map = list.get(i);
+            Integer weight = map.values().iterator().next();
             if (weight >= currentWeight.get()) {
-                return ID_WEIGHT_NAME.get(appId).get(weight);
+                return map.keySet().iterator().next();
             }
         }
         return null;
@@ -68,18 +70,29 @@ public class WeightRoundRobinSelector implements ServiceSelector {
         if (weight > oldVal) {
             ID_MAX_WEIGHT.put(appId, weight);
         }
-        Map<Integer, String> map = ID_WEIGHT_NAME.computeIfAbsent(appId, k -> new TreeMap<>());
-        map.put(weight, vo.getInstanceName());
+        List<Map<String, Integer>> list = ID_NAME_WEIGHT_LIST.computeIfAbsent(appId, k -> new ArrayList<>());
+        Map<String, Integer> map = new HashMap<>(1);
+        map.put(vo.getInstanceName(), weight);
+        list.add(map);
     }
 
     @Override
     public void buildFinish() {
-        ID_WEIGHT_NAME.forEach((id, wn) -> {
+        ID_NAME_WEIGHT_LIST.forEach((id, wn) -> {
             ID_CUR_WEIGHT.put(id, new AtomicInteger(ID_MAX_WEIGHT.get(id)));
-            Integer[] integers = wn.keySet().toArray(new Integer[0]);
+            // 返回的集合是排好序的 源集合不排序
+            wn = wn.stream().sorted(Comparator.comparingInt(x -> x.values().iterator().next())).collect(Collectors.toList());
+            ID_NAME_WEIGHT_LIST.replace(id, wn);
+            Integer[] integers = wn.stream().map(m -> m.values().iterator().next()).toArray(Integer[]::new);
             ID_WEIGHTS.put(id, integers);
         });
         calGcd();
+        finish = true;
+    }
+
+    @Override
+    public boolean validate() {
+        return finish;
     }
 
     /**

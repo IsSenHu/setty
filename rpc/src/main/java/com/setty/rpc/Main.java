@@ -3,7 +3,7 @@ package com.setty.rpc;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.rpc.select.SelectData;
 import com.setty.rpc.select.ServiceSelector;
-import com.setty.rpc.select.impl.WeightRoundRobinSelector;
+import com.setty.rpc.select.impl.AvgWeightRoundRobinSelector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,9 +12,10 @@ import java.util.Map;
  * @author HuSen
  * create on 2019/7/11 16:13
  */
+@SuppressWarnings("Duplicates")
 public class Main {
     public static void main(String[] args) {
-        ServiceSelector selector = new WeightRoundRobinSelector();
+        ServiceSelector selector = new AvgWeightRoundRobinSelector();
         AppVO vo1 = new AppVO();
         vo1.setAppId(1L);
         vo1.setHost("127.0.0.1");
@@ -26,7 +27,7 @@ public class Main {
         vo1.setLeaseInfo(null);
 
         Map<String, Object> params1 = new HashMap<>(1);
-        params1.put(SelectData.SIGN_WEIGHT, 1);
+        params1.put(SelectData.SIGN_WEIGHT, 4);
         selector.join(vo1, params1);
 
         AppVO vo2 = new AppVO();
@@ -40,7 +41,7 @@ public class Main {
         vo2.setLeaseInfo(null);
 
         Map<String, Object> params2 = new HashMap<>(1);
-        params2.put(SelectData.SIGN_WEIGHT, 3);
+        params2.put(SelectData.SIGN_WEIGHT, 2);
         selector.join(vo2, params2);
 
         AppVO vo3 = new AppVO();
@@ -54,13 +55,17 @@ public class Main {
         vo3.setLeaseInfo(null);
 
         Map<String, Object> params3 = new HashMap<>(1);
-        params3.put(SelectData.SIGN_WEIGHT, 7);
+        params3.put(SelectData.SIGN_WEIGHT, 1);
         selector.join(vo3, params3);
 
         selector.buildFinish();
 
-        for (int i = 0; i < 11; i++) {
-            System.out.println(selector.select(1L));
+        long l = System.nanoTime();
+        int number = 7000;
+        for (int i = 0; i < number; i++) {
+            selector.select(1L);
         }
+        // 1 2 1 3 1 2 1
+        System.out.println((double) (System.nanoTime() - l) / number / 1000000);
     }
 }
