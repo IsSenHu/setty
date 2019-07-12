@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 /**
  * 普通Hash算法
  *
+ * 优点:简单易懂
+ * 缺点:如果一个节点L宕机，那么新数据会落在 K = (M - 1) mod (N-1) 节点上，大量的数据将无法命中
+ *
  * @author HuSen
  * create on 2019/7/12 9:49
  */

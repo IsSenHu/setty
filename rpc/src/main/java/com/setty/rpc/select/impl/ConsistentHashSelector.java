@@ -11,6 +11,9 @@ import java.util.TreeMap;
 
 /**
  * 一致性Hash算法
+ * 单调性
+ * 分散性
+ * 平衡性
  *
  * @author HuSen
  * create on 2019/7/12 10:17
