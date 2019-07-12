@@ -40,7 +40,7 @@ public class RoundRobinSelector implements ServiceSelector {
     }
 
     @Override
-    public String select(Long appId) {
+    public String select(Long appId, Map<String, Object> params) {
         AtomicLong atomicLong = ID_CURRENT_SEQ_MAPPING.get(appId);
         Map<Integer, String> seqName = ID_SEQ_NAME_MAPPING.get(appId);
         long current = atomicLong.getAndIncrement();

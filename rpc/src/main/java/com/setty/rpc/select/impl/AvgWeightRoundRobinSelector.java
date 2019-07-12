@@ -25,7 +25,7 @@ public class AvgWeightRoundRobinSelector implements ServiceSelector {
     private boolean finish = false;
 
     @Override
-    public String select(Long appId) {
+    public String select(Long appId, Map<String, Object> params) {
         Integer now = idTotal.get(appId);
         List<Server> servers = idServers.get(appId);
         for (Server server : servers) {

@@ -13,10 +13,11 @@ public interface ServiceSelector extends SelectData {
     /**
      * 选择服务实例
      *
-     * @param appId appId
+     * @param appId  appId
+     * @param params 自定义参数
      * @return 服务实例
      */
-    String select(Long appId);
+    String select(Long appId, Map<String, Object> params);
 
     /**
      * 加入服务实例

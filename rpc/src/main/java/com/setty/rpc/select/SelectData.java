@@ -6,4 +6,6 @@ package com.setty.rpc.select;
  */
 public interface SelectData {
     String SIGN_WEIGHT = "weight";
+    String SIGN_KEY = "key";
+    String SIGN_COUNT = "count";
 }

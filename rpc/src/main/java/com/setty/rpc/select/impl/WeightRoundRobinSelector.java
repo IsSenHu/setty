@@ -34,7 +34,7 @@ public class WeightRoundRobinSelector implements ServiceSelector {
     private final Map<Long, Integer> ID_GCD = new HashMap<>();
 
     @Override
-    public String select(Long appId) {
+    public String select(Long appId, Map<String, Object> params) {
         List<Map<String, Integer>> list = ID_NAME_WEIGHT_LIST.get(appId);
         AtomicInteger index = ID_INDEX.get(appId);
         if (index.get() == -1) {
