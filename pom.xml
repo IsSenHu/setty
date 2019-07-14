@@ -9,6 +9,7 @@
         <module>rpc-consumer</module>
         <module>rpc-producer</module>
         <module>discovery</module>
+        <module>security</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

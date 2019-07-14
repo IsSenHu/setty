@@ -22,22 +22,25 @@ public class RoundRobinSelector implements ServiceSelector {
 
     private boolean buildFinished = false;
 
-    public void join(AppVO vo) {
+    @Override
+    public void join(AppVO vo, Map<String, Object> params) {
         Map<Integer, String> map = ID_SEQ_NAME_MAPPING.computeIfAbsent(vo.getAppId(), k -> new TreeMap<>());
         map.put(map.size(), vo.getInstanceName());
     }
 
+    @Override
     public void buildFinish() {
         ID_SEQ_NAME_MAPPING.keySet().forEach(id -> ID_CURRENT_SEQ_MAPPING.put(id, new AtomicLong(0)));
         buildFinished = true;
     }
 
+    @Override
     public boolean validate() {
         return buildFinished;
     }
 
     @Override
-    public String select(Long appId) {
+    public String select(Long appId, Map<String, Object> params) {
         AtomicLong atomicLong = ID_CURRENT_SEQ_MAPPING.get(appId);
         Map<Integer, String> seqName = ID_SEQ_NAME_MAPPING.get(appId);
         long current = atomicLong.getAndIncrement();
