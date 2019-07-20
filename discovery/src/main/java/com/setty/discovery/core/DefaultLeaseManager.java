@@ -62,7 +62,8 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
         // 只注册到自己区域的zone上去
         String region = dp.getRegion();
         String zoneStr;
-        if (StringUtils.equals(region, DiscoveryProperties.DEFAULT_REGION)) {
+        boolean defaultRegion = StringUtils.equals(region, DiscoveryProperties.DEFAULT_REGION);
+        if (defaultRegion) {
             zoneStr = DiscoveryProperties.DEFAULT_ZONE;
         } else {
             zoneStr = dp.getAvailabilityZones().get(region);
@@ -73,7 +74,7 @@ public class DefaultLeaseManager implements LeaseManager<AppVO, Long, String> {
         for (String zone : zones)
         {
             // 过滤掉自己
-            if (StringUtils.equals(zone, dp.getZone())) {
+            if (StringUtils.equals(zone, dp.getZone()) && dp.getIsRegistry()) {
                 continue;
             }
             String urlStr = dp.getServiceUrl().get(zone);

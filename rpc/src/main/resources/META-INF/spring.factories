@@ -1,4 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.setty.rpc.config.proto.EnableProtoServerAutoConfiguration,\
-  com.setty.rpc.config.proto.registry.ProtoClientBeanDefinitionRegistryPostProcessor,\
-  com.setty.rpc.config.proto.EnableProtoClientAutoConfiguration

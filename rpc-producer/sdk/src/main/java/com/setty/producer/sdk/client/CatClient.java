@@ -1,9 +1,9 @@
 package com.setty.producer.sdk.client;
 
 import com.setty.producer.sdk.proto.RpcProducer;
-import com.setty.rpc.annotation.proto.Client;
-import com.setty.rpc.annotation.proto.ProtoClient;
-import com.setty.rpc.callback.proto.ProtoCallback;
+import com.setty.rpc.proto.annotation.Client;
+import com.setty.rpc.proto.annotation.ProtoClient;
+import com.setty.rpc.proto.callback.ProtoCallback;
 
 /**
  * @author HuSen

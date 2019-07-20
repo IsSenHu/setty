@@ -1,5 +1,7 @@
 package com.setty.discovery.core.infs;
 
+import com.setty.discovery.vo.AppInstance;
+
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +24,7 @@ public interface LookupService<R, S> {
      *
      * @return 所有应用信息
      */
-    List<Map<S, R>> getApplications();
+    List<AppInstance> getApplications();
 
     /**
      * 根据 virtualHostname 使用 round-robin 方式获取下一个服务实例的方法

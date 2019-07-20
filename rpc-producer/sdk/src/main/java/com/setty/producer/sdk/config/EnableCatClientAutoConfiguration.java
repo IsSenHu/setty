@@ -1,7 +1,7 @@
 package com.setty.producer.sdk.config;
 
 import com.setty.producer.sdk.annotation.EnableCatClient;
-import com.setty.rpc.annotation.proto.EnableProtoClient;
+import com.setty.rpc.proto.annotation.EnableProtoClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 /**

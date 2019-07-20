@@ -4,34 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>rpc-producer</artifactId>
+        <artifactId>rpc</artifactId>
         <groupId>com.setty</groupId>
         <version>1.0.0</version>
     </parent>
-    <artifactId>server</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>rpc-proto</artifactId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.setty</groupId>
-            <artifactId>sdk</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.setty</groupId>
-            <artifactId>discovery</artifactId>
+            <artifactId>rpc-core</artifactId>
             <version>1.0.0</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>

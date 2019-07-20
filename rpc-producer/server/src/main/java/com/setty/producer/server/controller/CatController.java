@@ -3,9 +3,9 @@ package com.setty.producer.server.controller;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.setty.commons.proto.RpcProto;
 import com.setty.producer.sdk.proto.RpcProducer;
-import com.setty.rpc.annotation.proto.ProtoConsumer;
-import com.setty.rpc.annotation.proto.ProtoController;
-import com.setty.rpc.cons.proto.Code;
+import com.setty.rpc.core.cons.Code;
+import com.setty.rpc.proto.annotation.ProtoConsumer;
+import com.setty.rpc.proto.annotation.ProtoController;
 import lombok.extern.slf4j.Slf4j;
 
 /**
