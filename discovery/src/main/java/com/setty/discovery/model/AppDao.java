@@ -1,13 +1,12 @@
 package com.setty.discovery.model;
 
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Table;
 import com.setty.commons.vo.registry.AppVO;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author HuSen
@@ -16,11 +15,13 @@ import java.util.Map;
 public class AppDao {
 
     public AppVO findByIdAndName(Long appId, String instanceName) {
-        return Database.TB_APP.get(appId, instanceName);
+        ConcurrentMap<String, AppVO> map = Database.TB_APP.get(appId);
+        return map != null ? map.get(instanceName) : null;
     }
 
     public void insert(AppVO vo) {
-        Database.TB_APP.put(vo.getAppId(), vo.getInstanceName(), vo);
+        ConcurrentMap<String, AppVO> map = Database.TB_APP.computeIfAbsent(vo.getAppId(), k -> new ConcurrentHashMap<>());
+        map.put(vo.getInstanceName(), vo);
     }
 
     public void update(AppVO vo) {
@@ -29,23 +30,26 @@ public class AppDao {
     }
 
     public void delete(Long appId, String instanceName) {
-        Database.TB_APP.remove(appId, instanceName);
-    }
-
-    public List<AppVO> findAll() {
-        return new ArrayList<>(Database.TB_APP.values());
-    }
-
-    public List<AppVO> findByAppId(Long appId) {
-        if (Database.TB_APP.containsRow(appId)) {
-            Map<String, AppVO> row = Database.TB_APP.row(appId);
-            return new ArrayList<>(row.values());
-        } else {
-            return Lists.newArrayList();
+        ConcurrentMap<String, AppVO> map = Database.TB_APP.get(appId);
+        if (map != null) {
+            map.remove(instanceName);
         }
     }
 
+    public List<AppVO> findAll() {
+        List<AppVO> ret = new ArrayList<>();
+        Database.TB_APP.values().forEach(map -> ret.addAll(map.values()));
+        return ret;
+    }
+
+    public List<AppVO> findByAppId(Long appId) {
+        if (Database.TB_APP.containsKey(appId)) {
+            return new ArrayList<>(Database.TB_APP.get(appId).values());
+        }
+        return Lists.newArrayList();
+    }
+
     private static class Database {
-        private static final Table<Long, String, AppVO> TB_APP = HashBasedTable.create();
+        private static final ConcurrentMap<Long, ConcurrentMap<String, AppVO>> TB_APP = new ConcurrentHashMap<>();
     }
 }
