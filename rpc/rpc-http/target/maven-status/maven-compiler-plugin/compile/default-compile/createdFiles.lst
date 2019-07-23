@@ -1,0 +1,9 @@
+com\setty\rpc\http\annotation\HttpController.class
+com\setty\rpc\http\cache\GlobalCache.class
+com\setty\rpc\http\server\HttpServer$1.class
+com\setty\rpc\http\handler\server\RequestToMessengerHandler.class
+com\setty\rpc\http\annotation\EnableHttpServer.class
+com\setty\rpc\http\config\EnableHttpServerAutoConfiguration.class
+com\setty\rpc\http\annotation\HttpConsumer.class
+com\setty\rpc\http\handler\server\HttpDispatcherHandler.class
+com\setty\rpc\http\server\HttpServer.class

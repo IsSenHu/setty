@@ -1,0 +1,7 @@
+setty:
+  proto:
+    server:
+      instance-name: test
+      port: 8080
+  base:
+    app-code: 10000

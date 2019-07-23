@@ -14,4 +14,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ServerProperties {
     private int port;
     private long appId;
+    private String instanceName;
 }

@@ -1,0 +1,45 @@
+{
+  "groups": [
+    {
+      "name": "setty.proto.client",
+      "type": "com.setty.rpc.core.properties.ClientProperties",
+      "sourceType": "com.setty.rpc.core.properties.ClientProperties"
+    },
+    {
+      "name": "setty.proto.server",
+      "type": "com.setty.rpc.core.properties.ServerProperties",
+      "sourceType": "com.setty.rpc.core.properties.ServerProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "setty.proto.client.clients",
+      "type": "java.util.Map<java.lang.String,com.setty.rpc.core.properties.ClientP>",
+      "sourceType": "com.setty.rpc.core.properties.ClientProperties"
+    },
+    {
+      "name": "setty.proto.client.connection-timeout",
+      "type": "java.lang.Integer",
+      "sourceType": "com.setty.rpc.core.properties.ClientProperties",
+      "defaultValue": 2000
+    },
+    {
+      "name": "setty.proto.server.app-id",
+      "type": "java.lang.Long",
+      "sourceType": "com.setty.rpc.core.properties.ServerProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "setty.proto.server.instance-name",
+      "type": "java.lang.String",
+      "sourceType": "com.setty.rpc.core.properties.ServerProperties"
+    },
+    {
+      "name": "setty.proto.server.port",
+      "type": "java.lang.Integer",
+      "sourceType": "com.setty.rpc.core.properties.ServerProperties",
+      "defaultValue": 0
+    }
+  ],
+  "hints": []
+}

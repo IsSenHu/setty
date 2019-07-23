@@ -3,6 +3,7 @@ setty:
     server:
       app-id: 100000000
       port: 8081
+      instance-name: test1
   discovery:
     host: 127.0.0.1
     port: ${setty.proto.server.port}
