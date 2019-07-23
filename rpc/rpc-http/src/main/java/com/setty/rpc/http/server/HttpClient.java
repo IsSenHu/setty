@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * 1，接下来思考如何实现重连机制
+ *
  * @author HuSen
  * create on 2019/7/23 16:57
  */
