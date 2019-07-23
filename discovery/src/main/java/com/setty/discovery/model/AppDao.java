@@ -9,6 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * HashMap的线程安全问题 put 之后 get 获取不到
+ *
  * @author HuSen
  * create on 2019/7/5 14:54
  */
