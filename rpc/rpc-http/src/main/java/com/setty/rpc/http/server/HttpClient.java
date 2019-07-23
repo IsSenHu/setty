@@ -30,8 +30,12 @@ public class HttpClient {
     private final String name;
     private final int connectionTimeout;
     private Bootstrap bootstrap;
-    private boolean started;
-    private ChannelHandlerContext connection;
+
+    /**
+     * volatile 保证线程可见性 虽然不会每次都出现线程安全问题 但是可能会出现
+     */
+    private volatile boolean started;
+    private volatile ChannelHandlerContext connection;
 
     /**
      * 它会在计数器达到 0 的时候唤醒相应实例上的所有等待线程
