@@ -3,3 +3,12 @@ setty:
     server:
       app-id: 100000000
       port: 8081
+  discovery:
+    host: 127.0.0.1
+    port: ${setty.proto.server.port}
+    instance-name: test1
+    app-id: ${setty.proto.server.app-id}
+    service-url:
+      hs: http://127.0.0.1:10001/api/registry
+  base:
+    app-code: 20000

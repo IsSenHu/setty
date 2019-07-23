@@ -10,6 +10,7 @@ import com.setty.commons.vo.JsonResult;
 import com.setty.commons.vo.registry.AppVO;
 import com.setty.discovery.core.infs.LookupService;
 import com.setty.discovery.properties.DiscoveryProperties;
+import com.setty.discovery.vo.AppInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
@@ -71,9 +72,9 @@ public class DefaultLookupServiceImpl implements LookupService<AppVO, Long> {
     }
 
     @Override
-    public List<Map<Long, AppVO>> getApplications() {
+    public List<AppInstance> getApplications() {
         Map<String, AppVO> nameMap = new HashMap<>(16);
-        List<Map<Long, AppVO>> ret = new ArrayList<>();
+        List<AppInstance> ret = new ArrayList<>();
         getTargetUrls().forEach(url -> {
             if (url.endsWith(URL_SPLIT)) {
                 url = url + "apps";
@@ -82,11 +83,7 @@ public class DefaultLookupServiceImpl implements LookupService<AppVO, Long> {
             }
             getApplication(nameMap, url);
         });
-        nameMap.forEach((name, app) -> {
-            Map<Long, AppVO> map = new HashMap<>(1);
-            map.put(app.getAppId(), app);
-            ret.add(map);
-        });
+        nameMap.forEach((name, app) -> ret.add(new AppInstance(app.getAppId(), app)));
         return ret;
     }
 

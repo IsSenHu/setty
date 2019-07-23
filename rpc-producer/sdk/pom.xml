@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.setty</groupId>
-            <artifactId>rpc</artifactId>
+            <artifactId>rpc-proto</artifactId>
             <version>1.0.0</version>
         </dependency>
     </dependencies>

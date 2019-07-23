@@ -1,6 +1,7 @@
 package com.setty.commons.vo;
 
 import com.setty.commons.cons.JsonResultCode;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.io.Serializable;
  * create on 2019/7/5 14:30
  */
 @Data
+@AllArgsConstructor
 public class JsonResult<T> implements Serializable {
     private static final long serialVersionUID = -7886007263670793179L;
 
@@ -26,14 +28,6 @@ public class JsonResult<T> implements Serializable {
     public JsonResult<T> appCode(Integer appCode) {
         this.appCode = appCode;
         return this;
-    }
-
-    public JsonResult(Integer appCode, Integer code, String message, T data) {
-        this.appCode = appCode;
-        this.code = code;
-        this.message = message;
-        this.data = data;
-        this.time = System.currentTimeMillis();
     }
 
     public JsonResult(Integer code, String message, T data) {
@@ -53,12 +47,6 @@ public class JsonResult<T> implements Serializable {
     public JsonResult(Integer code, String message) {
         this.code = code;
         this.message = message;
-        this.time = System.currentTimeMillis();
-    }
-
-    public JsonResult(JsonResultCode jsonResultCode) {
-        this.code = jsonResultCode.getCode();
-        this.message = jsonResultCode.getMessage();
         this.time = System.currentTimeMillis();
     }
 }

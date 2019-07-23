@@ -1,0 +1,7 @@
+server:
+  port: 10001
+setty:
+  base:
+    app-code: 10000
+  discovery:
+    is-registry: true
