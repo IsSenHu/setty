@@ -31,7 +31,7 @@ public class HttpClient {
     private final int connectionTimeout;
     private Bootstrap bootstrap;
     private boolean started;
-    private volatile ChannelHandlerContext connection;
+    private ChannelHandlerContext connection;
 
     /**
      * 它会在计数器达到 0 的时候唤醒相应实例上的所有等待线程
