@@ -1,5 +1,6 @@
 package com.setty.rpc.http.server;
 
+import com.alibaba.fastjson.JSON;
 import com.setty.rpc.core.model.Request;
 import com.setty.rpc.http.handler.client.HttpResponseHandler;
 import com.setty.rpc.http.handler.client.LifeCycleHandler;
@@ -9,8 +10,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.*;
+import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CountDownLatch;
@@ -30,10 +31,6 @@ public class HttpClient {
     private final String name;
     private final int connectionTimeout;
     private Bootstrap bootstrap;
-
-    /**
-     * volatile 保证线程可见性 虽然不会每次都出现线程安全问题 但是可能会出现
-     */
     private volatile boolean started;
     private volatile ChannelHandlerContext connection;
 
@@ -101,6 +98,14 @@ public class HttpClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        String body = JSON.toJSONString(request);
+        byte[] bytes = body.getBytes(CharsetUtil.UTF_8);
+        HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, bytes.length);
+        HttpContent httpContent = new DefaultHttpContent(connection.alloc().buffer(bytes.length).writeBytes(bytes));
+        connection.write(httpRequest);
+        connection.write(httpContent);
+        connection.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
     }
 
     public void destroy() {

@@ -82,12 +82,16 @@ public class EnableHttpServerAutoConfiguration {
         }
 
         // 2.启动HttpServer
-        httpServer = new HttpServer(serverProperties.getPort());
+        httpServer = new HttpServer(serverProperties.getPort(), serverProperties.getInstanceName());
+        httpServer.setBossThreads(serverProperties.getBossThreads());
+        httpServer.setWorkerThreads(serverProperties.getWorkerThreads());
+        httpServer.setUseEpoll(serverProperties.isUseEpoll());
+        httpServer.setWriteTimeout(serverProperties.getWriteTimeout());
         httpServer.start();
     }
 
     @PreDestroy
     public void destroy() {
-        httpServer.close();
+        httpServer.stop(() -> log.warn("Http server is closed."));
     }
 }

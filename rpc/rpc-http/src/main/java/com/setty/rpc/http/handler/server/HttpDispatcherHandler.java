@@ -13,6 +13,8 @@ import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.lang.reflect.Method;
 
@@ -23,6 +25,16 @@ import java.lang.reflect.Method;
 @Slf4j
 public class HttpDispatcherHandler extends SimpleChannelInboundHandler<Request> {
 
+    private static final TaskExecutor QUEUE;
+    static {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        threadPoolTaskExecutor.setCorePoolSize(200);
+        threadPoolTaskExecutor.setQueueCapacity(100000);
+        threadPoolTaskExecutor.setMaxPoolSize(200);
+        threadPoolTaskExecutor.initialize();
+        QUEUE = threadPoolTaskExecutor;
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         if (log.isDebugEnabled()) {
@@ -31,29 +43,33 @@ public class HttpDispatcherHandler extends SimpleChannelInboundHandler<Request> 
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Request request) throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("receive message: {}", request);
-        }
-        String methodMark = request.getMethod();
-        // instanceName controller method
-        String[] icm = StringUtils.split(methodMark, Sign.POINT);
-        String controllerName = icm[1];
-        Object controller = GlobalCache.getController(controllerName);
-        Method method = GlobalCache.getMethod(methodMark);
+    protected void channelRead0(ChannelHandlerContext ctx, Request request) {
+        QUEUE.execute(() -> {
+            if (log.isDebugEnabled()) {
+                log.debug("receive message: {}", request);
+            }
+            Response<Object> objectResponse = new Response<>();
+            objectResponse.setId(request.getId());
+            objectResponse.setJsonrpc(request.getJsonrpc());
+            try {
+                String methodMark = request.getMethod();
+                // instanceName controller method
+                String[] icm = StringUtils.split(methodMark, Sign.POINT);
+                String controllerName = icm[1];
+                Object controller = GlobalCache.getController(controllerName);
+                Method method = GlobalCache.getMethod(methodMark);
 
-        Response<Object> objectResponse = new Response<>();
-        objectResponse.setId(request.getId());
-        objectResponse.setJsonrpc(request.getJsonrpc());
-
-        if (controller == null || method == null) {
-            objectResponse.setError(new Error(ErrorType.UNKNOWN_METHOD));
-        } else {
-            Object ret = method.invoke(controller, request);
-            objectResponse.setResult(ret);
-        }
-
-        response(ctx, objectResponse);
+                if (controller == null || method == null) {
+                    objectResponse.setError(new Error(ErrorType.UNKNOWN_METHOD));
+                } else {
+                    Object ret = method.invoke(controller, request);
+                    objectResponse.setResult(ret);
+                }
+            } catch (Exception e) {
+                objectResponse.setError(new Error(ErrorType.NETWORK_ERROR));
+            }
+            response(ctx, objectResponse);
+        });
     }
 
     private void response(ChannelHandlerContext ctx, Response<Object> objectResponse) {
@@ -66,11 +82,5 @@ public class HttpDispatcherHandler extends SimpleChannelInboundHandler<Request> 
         HttpContent content = new DefaultHttpContent(ctx.alloc().buffer(bytes.length).writeBytes(bytes));
         ctx.write(content);
         ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error("分发参数到方法异常:", cause);
-        ctx.channel().close();
     }
 }

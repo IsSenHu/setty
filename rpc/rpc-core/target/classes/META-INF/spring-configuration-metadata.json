@@ -6,7 +6,7 @@
       "sourceType": "com.setty.rpc.core.properties.ClientProperties"
     },
     {
-      "name": "setty.proto.server",
+      "name": "setty.server",
       "type": "com.setty.rpc.core.properties.ServerProperties",
       "sourceType": "com.setty.rpc.core.properties.ServerProperties"
     }
@@ -24,21 +24,45 @@
       "defaultValue": 2000
     },
     {
-      "name": "setty.proto.server.app-id",
+      "name": "setty.server.app-id",
       "type": "java.lang.Long",
       "sourceType": "com.setty.rpc.core.properties.ServerProperties",
       "defaultValue": 0
     },
     {
-      "name": "setty.proto.server.instance-name",
+      "name": "setty.server.boss-threads",
+      "type": "java.lang.Integer",
+      "sourceType": "com.setty.rpc.core.properties.ServerProperties",
+      "defaultValue": 1
+    },
+    {
+      "name": "setty.server.instance-name",
       "type": "java.lang.String",
       "sourceType": "com.setty.rpc.core.properties.ServerProperties"
     },
     {
-      "name": "setty.proto.server.port",
+      "name": "setty.server.port",
       "type": "java.lang.Integer",
       "sourceType": "com.setty.rpc.core.properties.ServerProperties",
       "defaultValue": 0
+    },
+    {
+      "name": "setty.server.use-epoll",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.setty.rpc.core.properties.ServerProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "setty.server.worker-threads",
+      "type": "java.lang.Integer",
+      "sourceType": "com.setty.rpc.core.properties.ServerProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "setty.server.write-timeout",
+      "type": "java.lang.Integer",
+      "sourceType": "com.setty.rpc.core.properties.ServerProperties",
+      "defaultValue": 20
     }
   ],
   "hints": []
