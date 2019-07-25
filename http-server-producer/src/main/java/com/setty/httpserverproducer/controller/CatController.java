@@ -16,7 +16,6 @@ public class CatController {
 
     @HttpConsumer("add")
     public JsonResult<String> add(Request request) {
-        log.info("请求:{}", request);
         return new JsonResult<>("好的");
     }
 }

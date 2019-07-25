@@ -1,8 +1,9 @@
 package com.setty.rpc.http.server;
 
 import com.setty.rpc.http.demo.AbstractServer;
-import com.setty.rpc.http.handler.server.HttpDispatcherHandler;
+import com.setty.rpc.http.handler.server.LogicHandler;
 import com.setty.rpc.http.handler.server.RequestToMessengerHandler;
+import com.setty.rpc.http.task.Publisher;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollChannelOption;
@@ -30,9 +31,11 @@ public class HttpServer extends AbstractServer {
     private ServerBootstrap bootstrap;
     private int bossThreads;
     private volatile boolean running = false;
+    private Publisher publisher;
 
-    public HttpServer(int port, String name) {
+    public HttpServer(int port, String name, Publisher publisher) {
         super(name, port);
+        this.publisher = publisher;
     }
 
     @Override
@@ -107,7 +110,7 @@ public class HttpServer extends AbstractServer {
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(1024 * 64));
         pipeline.addLast(new RequestToMessengerHandler());
-        pipeline.addLast(new HttpDispatcherHandler());
+        pipeline.addLast(new LogicHandler(publisher));
     }
 
     @Override

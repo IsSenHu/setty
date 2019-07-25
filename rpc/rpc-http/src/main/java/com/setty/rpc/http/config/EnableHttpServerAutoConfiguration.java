@@ -7,12 +7,14 @@ import com.setty.rpc.http.annotation.HttpConsumer;
 import com.setty.rpc.http.annotation.HttpController;
 import com.setty.rpc.http.cache.GlobalCache;
 import com.setty.rpc.http.server.HttpServer;
+import com.setty.rpc.http.task.Publisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -51,6 +53,11 @@ public class EnableHttpServerAutoConfiguration {
         }
     }
 
+    @Bean
+    public Publisher publisher() {
+        return new Publisher();
+    }
+
     private void doInit(ApplicationStartedEvent event) {
         ApplicationContext context = event.getApplicationContext();
         String instanceName = serverProperties.getInstanceName();
@@ -82,7 +89,7 @@ public class EnableHttpServerAutoConfiguration {
         }
 
         // 2.启动HttpServer
-        httpServer = new HttpServer(serverProperties.getPort(), serverProperties.getInstanceName());
+        httpServer = new HttpServer(serverProperties.getPort(), serverProperties.getInstanceName(), publisher());
         httpServer.setBossThreads(serverProperties.getBossThreads());
         httpServer.setWorkerThreads(serverProperties.getWorkerThreads());
         httpServer.setUseEpoll(serverProperties.isUseEpoll());
